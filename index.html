@@ -164,6 +164,16 @@ button.alr{display:block;width:100%;text-align:left;border:0;color:var(--ink)}
 .cvm.hit{background:var(--redsoft);box-shadow:inset 0 0 0 1.5px var(--red)}
 .cvm em{display:block;font-style:normal;font-size:12.5px;color:var(--red);font-weight:800;margin-top:2px}
 .exlist{display:grid;gap:8px;margin:2px 0 8px 42px}.exg small{display:block;font-size:12.5px;font-weight:800;color:var(--mute);margin:0 0 4px 2px}.exg>div{display:flex;flex-wrap:wrap;gap:6px}.exg .chip{min-height:40px;padding:6px 12px;font-size:15px}
+.guide .gt{display:flex;gap:8px;align-items:center;font-weight:800;font-size:16.5px;margin-bottom:6px!important}.guide .gt svg{width:20px;height:20px;color:var(--brand)}
+.guide.urgent{box-shadow:inset 0 0 0 1.5px var(--red)}.guide.urgent .gt{color:var(--red)}.guide.urgent .gt svg{color:var(--red)}
+.gstep{display:grid;grid-template-columns:24px 1fr;gap:8px;margin:6px 0;font-size:15.5px;line-height:1.5}.gstep b{width:24px;height:24px;border-radius:50%;background:var(--brandsoft);color:var(--brandink);display:grid;place-items:center;font:800 13px Inter,sans-serif}
+.guide.urgent .gstep b{background:var(--redsoft);color:var(--red)}.gsub{font-weight:800;font-size:14.5px;margin-top:10px!important;color:var(--mute)}
+.quote{background:var(--brandsoft);color:var(--brandink);border-radius:14px;padding:10px 12px;font-weight:700;margin-top:6px}
+.mnote{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--mute);margin:0 0 8px}.mnote svg{width:16px;height:16px}
+.stage{margin:10px 0 2px;border-top:1px dashed var(--line);padding-top:8px}.stage small{font-size:12.5px;color:var(--mute);font-weight:700}
+.sbar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px}.sbar span{font-size:11px;line-height:1.25;color:var(--mute);text-align:center;display:grid;gap:4px;justify-items:center}
+.sbar i{display:block;height:7px;width:100%;border-radius:9px;background:var(--line)}.sbar .on i{background:var(--amber)}.res.high .sbar .on i{background:var(--red)}.sbar .cur{color:var(--ink);font-weight:800}
+.stage p{margin:6px 0 0;font-size:14px;font-weight:700}
 .mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
 .mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
 .me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
@@ -609,7 +619,7 @@ function analyse(raw){
 function facts(r){
   const all = r.lines.filter(l => l.who !== undefined), them = all.filter(l => l.who !== '我'), base = them.length ? them : all, txt = base.map(l => l.text).join('\n'), F = [];
   const nm = them.map(l => l.who).find(w => w && w !== '對方' && w !== '（描述）');
-  const claim = txt.match(/(?:我是|自稱|這裡是)([^，。！？\s]{1,10})/) || txt.match(/(老朋友|老同學|檢察官|警察|地檢署|法院|客服|銀行專員|投資老師|老師|助理|主管)/);
+  const claim = txt.match(/(?:我是|自稱|這裡是)(?!誰)([^，。！？?\s]{1,10})/) || txt.match(/(老朋友|老同學|檢察官|警察|地檢署|法院|客服|銀行專員|投資老師|老師|助理|主管)/);
   const cl = claim ? (claim[1] || claim[0]) : ''; if (nm || cl) F.push(['對方', [nm, cl && cl !== nm ? `自稱${cl}` : ''].filter(Boolean).join('，')]);
   const asks = []; [[/借/, '借錢'], [/(匯款|轉帳|轉給|轉我|一筆轉|網銀)/, '轉帳或匯款'], [/(入金|儲值)/, '入金'], [/ATM/i, '去 ATM 操作'], [/(提現金|領現金|提領|給你現金|面交)/, '給現金'], [/點數/, '買點數'], [/(驗證碼|OTP|密碼)/i, '給驗證碼或密碼'], [/(加.{0,12}(LINE|賴|專員|客服)|私訊|加好友)/i, '加 LINE 找專員或私訊'], [/(下載|安裝).{0,6}(App|APP|程式)/, '下載 App'], [/(監管|交給.{0,4}保管)/, '把錢交給他監管']]
     .forEach(([re, s]) => { if (re.test(txt)) asks.push(s); }); if (asks.length) F.push(['要求', asks.join('、')]);
@@ -662,18 +672,18 @@ function greet(){
   bot({kind:'text', text:['嗨，我是 Whoscam 防詐小幫手。', '收到怪怪的訊息嗎？選一個開始，30 秒告訴你風險和下一步。']});
   S.msgs.push({from:'bot', kind:'start'});
 }
-async function analyseText(text, scen, label, shots, noEcho, src){
-  S.flow = null; if (!noEcho){ if (shots && shots.length) me({kind:'img', urls:shots}); else me({kind:'conv', label, text}); }
+async function analyseText(text, scen, label, shots, noEcho, src, o){
+  S.flow = null; if (o && o.echo) me({kind:'conv', label:'', text:o.echo}); else if (!noEcho){ if (shots && shots.length) me({kind:'img', urls:shots}); else me({kind:'conv', label, text}); }
   typing(); const t0 = Date.now(); let r;
   if (scen) r = analyse(maskText(text)); else { try { r = await aiAnalyse(maskText(text)); } catch (e) { r = analyse(maskText(text)); r.aiFail = true; } }
-  r.text = text; r.scen = scen; r.src = src || (scen ? 'example' : 'paste'); r.facts = facts(r); S.result = r; await wait(Math.max(0, 1300 - (Date.now() - t0)));
+  r.text = text; r.scen = scen; r.src = src || (scen ? 'example' : 'paste'); r.facts = facts(r); r.prev = o ? o.prev : null; r.merged = !!(o && o.echo); S.result = r; await wait(Math.max(0, 1300 - (Date.now() - t0)));
   untype(); bot({kind:'result', r});
   const list = r.level === 'low' ? [{t:'再檢查另一段', a:'shot', ic:'img'}, {t:'為什麼這樣判斷？', a:'why'}] :
-    [{t:'我已經匯款了', a:'paid', red:true}, {t:'請家人幫我看', a:'family'}, {t:'為什麼危險？', a:'why'}];
+    [{t:'我已經匯款了', a:'paid', red:true}, {t:'我該怎麼回？', a:'reply'}, {t:'請家人幫我看', a:'family'}, {t:'為什麼危險？', a:'why'}];
   if (TTS) list.push({t:'唸給我聽', a:'speak', ic:'speak'});
   list.push({t:'問新問題', a:'newchat', ic:'edit', dim:true}); S.scrollTo = '.res';
   chips(list); render();
-  if (r.level === 'high' && S.trig.high) fireCircle('高風險檢查結果');
+  if (r.level === 'high' && r.prev !== 'high' && S.trig.high) fireCircle('高風險檢查結果');
 }
 async function handleShots(files){
   const urls = files.map(f => URL.createObjectURL(f)); S.shots = urls; S.review = null;
@@ -714,6 +724,66 @@ function reviewSheet(){
     closeSheet(); const last = S.msgs.at(-1); if (last && last.kind === 'chips') last.used = true; const urls = R.urls; S.review = null;
     me({kind:'text', text:[`已確認 ${lines.filter(l => !l.startsWith('【')).length} 則訊息`]}); await analyseText(lines.join('\n'), '', '', urls, true, 'shot'); };
 }
+// ---------- smarter assistant: stages, replies, situations ----------
+const STAGES = [
+ ['接觸你', ['imperson', 'platform', 'group', 'freebie', 'loan', 'job', 'adult', 'romance', 'foreign', 'bill', 'telecom', 'link', 'fakeurl', 'shorturl']],
+ ['取得信任', ['profit', 'authority', 'cs', 'loan', 'romance', 'group', 'imperson', 'telecom', 'adult']],
+ ['要錢或要資料', ['money', 'otp', 'card', 'remote', 'points', 'fakeurl', 'link']],
+ ['不讓你查證', ['secrecy', 'pressure', 'fake165']],
+ ['一直加碼', ['unfreeze', 'withdraw', 'extort']],
+];
+function stageOf(r){ const on = STAGES.map(s => s[1].some(k => r.found[k])); let top = -1; on.forEach((v, i) => { if (v) top = i; }); return {on, top}; }
+const STAGE_TIP = ['對方剛開始接觸你，現在封鎖最省事。', '對方正在讓你相信他，還沒開口要錢，現在停下來最安全。', '已經到「要錢或要資料」這一步，現在停下來還來得及。', '對方在阻止你查證，這是詐騙最關鍵的時刻，先停下來問人。', '對方一直加碼要錢，付再多都拿不回來，立刻停止並報案。'];
+const NO_REPLY = {loan:1, bill:1, fakeurl:1, freebie:1, shorturl:1, link:1, authority:1, fake165:1, telecom:1, adult:1, unfreeze:1, points:1, extort:1, foreign:1};
+function replyFor(r){
+  const kk = r.type === '假買家（金流認證）' ? 'buyer' : r.type === '假交友投資' ? 'romance' : r.type === '需要先確認的金錢往來' ? 'money' : (TYPES.find(t => t[1] === r.type) || [''])[0];
+  if (NO_REPLY[kk]) return {no:true, why:{extort:'先不要回、不要付錢。保留證據後封鎖，打 110。', authority:'不用回，直接掛斷，自己打 165 或 110 查證。', fake165:'馬上掛斷，用另一支電話自己撥 165。', telecom:'不用回、不要按任何鍵，自己打電信客服查。', adult:'不要再回，直接封鎖；不要提供住址、學校或公司。', unfreeze:'不要再回、不要再付，保留對話後封鎖並報案。', points:'不要回，也不要買任何點數，直接封鎖。'}[kk] || '不用回，直接刪除並封鎖。回覆只會讓對方知道這個號碼有人在用。'};
+  const T = {imperson:'我先打你原本的電話確認一下，等等再聊。', otp:'驗證碼不能給任何人，我先打電話給你確認。', cs:'我會自己打官方客服確認，不需要你協助。', buyer:'我只在平台內交易，不會加客服 LINE，也不會操作網銀。', platform:'我只在平台內交易，沒辦法私下匯款。', profit:'我不投資，謝謝，請不要再傳了。', group:'我不參加，謝謝。', withdraw:'我不會再匯任何錢。', romance:'我們先視訊見面，錢的事我不參與。', job:'我不會提供提款卡、帳戶或密碼，謝謝。', card:'我不會交出任何卡片或存摺。', remote:'我不會分享螢幕，也不會下載你給的 App。', money:'我先打你原本的電話確認一下，再決定要不要轉。'};
+  return {text:T[kk] || '我要先跟家人確認，暫時不會付款。', tip:kk === 'imperson' || kk === 'money' || kk === 'otp' ? '打給本人「原本」的電話，不要打對方給的新號碼。' : '說完就可以封鎖，不用跟對方爭論。'};
+}
+const DASH = 'https://165dashboard.tw';
+const LINE_STEPS = ['到 LINE「設定」立刻變更密碼，關閉「允許自其他裝置登入」，並登出不明裝置', '如果已經被登出：不要刪除 App，在「已登出帳號」畫面按「再次登入」取回帳號', '門號或密碼被改了：到 LINE 客服網頁選「不登入並繼續操作」填表，請 LINE 協助', '傳訊息或打電話告訴親友：你的帳號可能被盜，用你名義借錢都不要理'];
+const INTENTS = [
+ {id:'paid', me:true, re:/((已經|剛剛|剛才|不小心|我|昨天|今天).{0,8}(匯|轉|付|繳|入金|領出|交給|面交).{0,10}(錢|款|了|給他|給對方|過去|萬|元))|被騙了|被詐騙了|錢被騙|被騙錢/, go:'sos'},
+ {id:'otp', me:true, urgent:true, title:'驗證碼或密碼給出去了，馬上這樣做', re:/((給|傳|告訴|輸入|念|貼|回傳).{0,8}(驗證碼|認證碼|OTP|簡訊碼|密碼|帳密))|((驗證碼|認證碼|密碼).{0,6}(給|傳|告訴)(了|他|對方))/i,
+  steps:['如果是 LINE 的驗證碼：', ...LINE_STEPS, '如果是銀行或信用卡的驗證碼：馬上打卡片背面的客服電話，請銀行凍結交易', '打 165 報案，保留對話截圖'], chips:['call', 'sos']},
+ {id:'cardinfo', me:true, urgent:true, title:'輸入了信用卡資料，馬上停卡', re:/(輸入|填|給|打了).{0,8}(信用卡|卡號|安全碼|CVV|到期日)/i,
+  steps:['馬上打卡片背面的電話，請發卡銀行停卡', '請銀行檢查最近的交易，有不明扣款要求處理', '保留簡訊、網址和頁面截圖', '打 165 或到派出所報案'], chips:['call']},
+ {id:'clicked', me:true, title:'點了可疑連結，看你做到哪一步', re:/(點|按|打開|進去|掃).{0,6}(連結|網址|網站|QR|條碼)/i,
+  steps:['只有點開、沒有輸入資料：關掉網頁就好，不要下載任何東西', '有輸入帳號密碼：立刻從官方 App 或官網改密碼', '有輸入信用卡或驗證碼：馬上打銀行停卡、凍結交易', `網址可以到 165 打詐儀錶板（${DASH.replace('https://', '')}）查詢`], chips:['dash', 'call']},
+ {id:'handcard', me:true, urgent:true, title:'交出了提款卡或證件，馬上這樣做', re:/((寄|交|給|放).{0,8}(提款卡|金融卡|存摺|印章|身分證|健保卡|自然人憑證))|((提款卡|金融卡|存摺|印章|身分證|健保卡|自然人憑證).{0,8}(寄|交|給|放))/,
+  steps:['馬上打銀行掛失提款卡、停用網路銀行', '到派出所報案並說明經過，避免帳戶被當成人頭帳戶，自己也要負法律責任', '證件被拿走的話，到戶政事務所申請補發', '不要再寄出任何卡片或幫任何人收錢、轉錢'], chips:['call']},
+ {id:'remote', me:true, urgent:true, title:'分享了螢幕或裝了對方給的 App', re:/((下載|安裝).{0,8}(App|APP|程式|軟體))|分享(了)?螢幕|共享螢幕|遠端/i,
+  steps:['立刻結束視訊、關閉螢幕分享', '把對方要你裝的 App 刪掉；不確定的話先把手機關網路', '用另一台裝置改網銀、email 和 LINE 密碼', '打給銀行請他們凍結帳戶、檢查交易', '打 165 報案'], chips:['call']},
+ {id:'threat', urgent:true, title:'被拿影片或照片威脅', re:/(威脅|勒索|恐嚇)|((影片|照片|裸照|視訊).{0,10}(散布|外流|傳出去|公開|傳給))/,
+  steps:['不要付錢：付了只會被要更多', '不要刪除對話，截圖保留對方帳號、對話和匯款資訊', '保留證據後封鎖對方', '打 110 報案；也可以向衛福部「性影像處理中心」申請協助下架', '告訴一個你信任的人，你不需要一個人面對'], chips:['call']},
+ {id:'linehack', me:true, urgent:true, title:'LINE 帳號被盜，這樣取回', re:/((LINE|賴).{0,6}(被盜|被登出|登不進|被別人登入|被駭))|帳號被盜/i, steps:[...LINE_STEPS, '打 165 報案'], chips:['call']},
+ {id:'frozen', title:'帳戶被凍結或變成警示帳戶', re:/(警示帳戶|帳戶.{0,4}(被)?(凍結|鎖住|鎖了)|不能轉帳)/,
+  steps:['先打銀行客服問清楚原因', '如果你曾把帳戶、提款卡或網銀交給別人，主動到派出所說明', '不要再幫任何人「收款再轉出」，那就是在幫詐騙集團洗錢'], chips:['call']},
+ {id:'checkid', title:'怎麼查 LINE ID、網址或電話', re:/((查|確認|怎麼知道|怎麼看).{0,10}(LINE ?ID|網址|網站|連結|電話|號碼|帳號))/i,
+  steps:[`網址：到 165 打詐儀錶板（${DASH.replace('https://', '')}）用「涉詐網址查詢」`, '165 打詐儀錶板也有 AI 小幫手，可以描述狀況問它', 'LINE ID：加入「165防騙宣導」LINE 官方帳號查詢', '電話：不要回撥，自己查官方電話或打 165 問', '也可以直接把對話傳給我'], chips:['dash']},
+ {id:'verify', title:'怎麼確認對方是不是真的', re:/((怎麼|如何|要怎樣).{0,6}(確認|知道|判斷|分辨).{0,12}(銀行|客服|警察|檢察官|本人|真的|真假|是不是))/,
+  steps:['先掛斷或停止回覆，不要用對方給的電話或連結', '銀行：打卡片背面或官網上的客服電話', '警察、檢察官：自己打 165 或 110', '家人朋友：打他原本的號碼，問一件只有本人知道的事', '客服：從官方 App 或官網找客服'], chips:['call']},
+ {id:'report', title:'怎麼報案', re:/((怎麼|要|可以|去哪).{0,4}(報案|報警|檢舉))|^(報案|報警)/,
+  steps:['撥打 165 反詐騙專線（24 小時）或 110', '也可以到附近的派出所', '準備：對話截圖、對方帳號或電話、匯款收據、時間和金額', '已經匯款的話越快越好，也要打給你匯出的銀行請他們攔阻'], chips:['call', 'sos']},
+ {id:'reply', re:/((要不要|該不該|怎麼|要怎麼|如何).{0,4}(回|回覆|回應|封鎖|拒絕))/, go:'reply'},
+ {id:'family', title:'擔心家人被騙，可以這樣做', re:/(我的?)?(媽|爸|阿嬤|阿公|奶奶|爺爺|外婆|外公|家人|老公|老婆|小孩|兒子|女兒|弟|妹|哥|姊).{0,10}(被騙|詐騙|怪怪|一直講|要匯|要投資|要解定存|借錢)/,
+  steps:['先不要責怪，用關心的語氣問他發生什麼事', '請他把對話傳給你，或一起用 Whoscam 檢查', '已經要匯款或解定存的話，可以用「我是擔心家人」通知銀行加強關懷', '邀請他加入家人守護圈，下次有風險你會收到通知'], chips:['famsos', 'gofam']},
+ {id:'hello', title:'我可以幫你做這些事', re:/^(你好|嗨|哈囉|hi|hello|help|幫助|怎麼用|你可以做什麼|你會什麼)[!！?？。]*$/i,
+  steps:['傳截圖或貼上可疑訊息：告訴你風險和下一步', '說說你遇到的狀況，例如「我點了連結」「我給了驗證碼」', '被騙了按「我被騙了」：一步步陪你處理、寫好報告送銀行', '家人守護：有風險時通知家人'], chips:['shot', 'examples']},
+];
+const looksLikeConv = v => /\n/.test(v.trim()) || /^[^：:\s]{1,10}[：:]/.test(v) || /(https?:\/\/|www\.)/i.test(v) || v.length > 90;
+const SMSY = /(【|】|您的|恭喜您|請於|請點擊|敬愛的|親愛的用戶|客戶您好|本公司)/;
+const FIRST = /(我|已經|剛剛|剛才|不小心|怎麼辦|昨天|今天)/;
+function matchIntent(v){ if (looksLikeConv(v) || SMSY.test(v)) return null; return INTENTS.find(x => x.re.test(v) && (!x.me || FIRST.test(v))) || null; }
+const GCHIP = {call:{t:'撥打 165', a:'call', ic:'phone'}, sos:{t:'我被騙了，幫我處理', a:'sos', red:true}, dash:{t:'打開 165 打詐儀錶板', a:'dash', ic:'shield'}, famsos:{t:'通知銀行關心家人', a:'famsos'}, gofam:{t:'去家人守護', a:'gofam'}, shot:{t:'傳截圖給我', a:'shot', ic:'img', main:true}, examples:{t:'試試範例', a:'examples'}};
+function answerIntent(it){
+  if (it.go === 'sos'){ startSOS(); return; }
+  if (it.go === 'reply'){ if (S.result && S.result.level !== 'low'){ bot({kind:'reply', r:S.result}); chips([{t:'問新問題', a:'newchat', ic:'edit', dim:true}]); }
+    else { bot({kind:'text', text:['陌生人的可疑訊息不用回，直接封鎖、檢舉就好。', '如果是熟人突然要錢，先打他「原本」的電話確認是本人。']}); chips([{t:'傳截圖給我', a:'shot', ic:'img'}]); } render(true); return; }
+  bot({kind:'guide', g:it.id}); chips((it.chips || []).map(c => GCHIP[c]).concat([{t:'問新問題', a:'newchat', ic:'edit', dim:true}])); render(true);
+}
+
 // ---------- recover flow ----------
 function acctOf(){ const r = S.result; if (!r) return ''; const m = r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/); return m ? m[0] : ''; }
 function attachList(){ const R = S.rec, list = []; S.shots.forEach((u, i) => list.push({k:'img', u, n:`截圖 ${i + 1}`}));
@@ -753,10 +823,13 @@ function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('�
 async function act(a){
   if (S.tab !== 'chat' && ['paste', 'sos', 'examples', 'paid'].includes(a)){ S.tab = 'chat'; S.page = null; }
   const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start' || last.kind === 'exlist') && a !== 'shot' && a !== 'review') last.used = true;
-  const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
+  const label = (S._chipLabel || '').trim(); if (label && !['dash', 'famsos', 'shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
   if (a === 'reset' || a === 'newchat'){ closeDrawer(); newChat(); S.tab = 'chat'; S.page = null; render(); return; }
   if (a === 'history'){ S.tab = 'chat'; S.page = null; render(); openDrawer(); return; }
   if (a === 'review'){ if (S.review) reviewSheet(); else toast('這段已經確認過了'); return; }
+  if (a === 'reply'){ if (S.result) bot({kind:'reply', r:S.result}); render(true); return; }
+  if (a === 'dash'){ window.open(DASH, '_blank', 'noopener'); return; }
+  if (a === 'famsos'){ startSOS(); S.msgs.splice(-2); S.rec.who = 'family'; S.flow = 'note'; bot({kind:'text', text:['用一句話告訴我，你觀察到家人怎麼了？', '例如：媽媽一直講投資老師，說要去解定存。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
   if (a === 'shot'){ $('#shotin').click(); render(); return; }
   if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
   if (a === 'examples'){ bot({kind:'text', text:['選一段範例試試看。這些都是 165 和刑事局公布過的常見手法；「一般」是正常訊息，可以看看哪些會被提醒。']}); S.msgs.push({from:'bot', kind:'exlist'}); render(true); return; }
@@ -786,7 +859,11 @@ async function onSend(){
   const box = $('#msg'); const v = box.value.trim(); if (!v || S.busy) return; box.value = '';
   if (S.flow === 'amount'){ const n = +v.replace(/[^\d]/g, ''); me({kind:'text', text:[v]}); if (!n){ bot({kind:'text', text:['請輸入數字，例如 50000。']}); render(true); return; } S.rec.amount = n; await makeReport(); return; }
   if (S.flow === 'note'){ me({kind:'text', text:[v]}); S.rec.note = v; await makeReport(); return; }
-  S.shots = []; S.busy = true; await analyseText(v, '', ''); S.busy = false;
+  const it = matchIntent(v); if (it){ me({kind:'text', text:[v]}); answerIntent(it); return; }
+  S.shots = []; S.busy = true;
+  if (S.result && !S.rec){ const p = S.result; await analyseText(p.text + '\n' + v, '', '', null, true, p.src === 'example' ? 'paste' : p.src, {echo:v, prev:p.level}); }
+  else await analyseText(v, '', '');
+  S.busy = false;
 }
 async function speakResult(){ const r = S.result; if (!TTS || !r) return; const txt = `${LV[r.level].n}，${LV[r.level].a}。${r.type && r.type !== '一般對話' ? '這可能是' + r.type + '。' : ''}${r.why}`;
   try { await TTS.speak(txt, {rate:0.9}); } catch (e) { if (e && e.code === 'not_granted') { TTS = null; render(); } } }
@@ -822,11 +899,18 @@ function msgHTML(m, i){
   else if (m.kind === 'conv'){ const ls = m.text.split('\n').filter(Boolean).slice(0, 5); body = `<div class="bub">${m.label ? `<p>${esc(m.label)}</p>` : ''}<div class="mini">${ls.map(l => `<div>${esc(l)}</div>`).join('')}</div></div>`; }
   else if (m.kind === 'result'){ const r = m.r, L = LV[r.level];
     body = `<div class="res ${r.level}"><div class="top">${tl(L.on)}<div><h3>${L.n}<br>${L.a}</h3></div></div><div class="body">${r.type && r.type !== '一般對話' ? `<span class="type">這可能是${esc(r.type)}。</span>` : ''}${esc(r.why)}
+      ${r.merged ? `<div class="mnote">${I('clock')}和前面的對話一起判斷${r.prev && r.prev !== r.level ? `：風險從「${LV[r.prev].n}」變成「${LV[r.level].n}」` : ''}</div>` : ''}
+      ${r.level !== 'low' ? (() => { const st = stageOf(r); return st.top >= 0 ? `<div class="stage"><small>詐騙進行到哪一步</small><div class="sbar">${STAGES.map((s, i) => `<span class="${st.on[i] ? 'on' : ''} ${i === st.top ? 'cur' : ''}"><i></i>${s[0]}</span>`).join('')}</div><p>${STAGE_TIP[st.top]}</p></div>` : ''; })() : ''}
       ${r.facts && r.facts.length ? `<div class="facts">${r.facts.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
       ${r.names.length ? `<div class="tags">${r.names.map(n => `<span class="tag">${esc(n)}</span>`).join('')}</div>` : ''}<div style="margin-top:8px"><span class="badge ${r.ai ? '' : 'm'}">${r.ai ? 'Claude AI 分析' : !SAMPLE ? '防詐規則判斷' : r.aiFail ? '規則版（AI 暫時無法使用）' : '規則版（範例）'}</span></div></div>
       ${r.level === 'low' ? '' : `<div class="btns"><button class="btn red" data-act="call" data-label="打電話查證">${I('phone')}先別付款，打電話查證</button></div>`}</div>`; }
   else if (m.kind === 'why'){ const r = m.r, hits = RULES.filter(x => r.found[x.k]);
     body = `<div class="bub">${hits.length ? `<p><b>我看到 ${hits.length} 個警訊：</b></p>${hits.map((x, j) => `<p>${j + 1}. <b>${x.name}</b>：${esc(x.tip)}${r.first[x.k] ? `<br><span style="color:var(--mute);font-size:14.5px">「${esc(r.first[x.k].slice(0, 30))}」</span>` : ''}</p>`).join('')}` : '<p>沒有看到常見的詐騙訊號，不過有疑問時，還是可以打電話給本人或官方查證。</p>'}${r.links && r.links.some(x => !x.official) ? `<p style="margin-top:10px"><b>網址檢查：</b></p>${r.links.filter(x => !x.official).map(x => `<p><span style="font-family:ui-monospace,monospace;font-size:13.5px;word-break:break-all;color:var(--red)">${esc(x.host)}</span><br>${x.reasons.map(t => '・' + esc(t)).join('<br>')}</p>`).join('')}` : ''}${r.check && r.check.length ? `<p style="margin-top:10px"><b>建議你這樣做：</b></p>${r.check.map(c => `<p>✓ ${esc(c)}</p>`).join('')}` : ''}</div>`; }
+  else if (m.kind === 'guide'){ const it = INTENTS.find(x => x.id === m.g); let ol = '', n = 0;
+    it.steps.forEach(st => { if (/：$/.test(st)) ol += `<p class="gsub">${esc(st)}</p>`; else ol += `<div class="gstep"><b>${++n}</b><span>${esc(st)}</span></div>`; });
+    body = `<div class="bub guide ${it.urgent ? 'urgent' : ''}"><p class="gt">${I(it.urgent ? 'sos' : 'shield')}${esc(it.title)}</p>${ol}</div>`; }
+  else if (m.kind === 'reply'){ const R = replyFor(m.r);
+    body = R.no ? `<div class="bub"><p><b>建議不要回</b></p><p>${esc(R.why)}</p></div>` : `<div class="bub"><p><b>可以這樣回：</b></p><div class="quote">${esc(R.text)}</div><button class="chip" data-copy="${esc(R.text)}" style="margin-top:8px">${I('copy')}複製這句</button><p style="font-size:14px;color:var(--mute)">${esc(R.tip)}</p></div>`; }
   else if (m.kind === 'call') body = `<div class="bub"><p><b>用你自己查到的電話查證，不要用對方給的。</b></p><div class="numcard"><div><span>你的往來銀行</span><b>銀行官網的客服</b></div><div><span>說是家人朋友</span><b>打他原本的號碼</b></div></div><a class="btn red" href="tel:165">${I('phone')}撥打 165 反詐騙專線</a></div>`;
   else if (m.kind === 'report'){ const R = m.rec || S.rec, att = attachList();
     body = `<div class="rep"><h4>${R.who === 'family' ? '關懷通報' : '疑似詐騙通報'}<span class="badge ${R.by === 'ai' ? '' : 'm'}">${R.by === 'ai' ? 'Claude 撰寫' : R.by === 'user' ? '已修改' : '自動帶入'}</span></h4><pre>${esc(R.report)}</pre>
@@ -1165,6 +1249,7 @@ function renderTasks(){ $('#tasks').innerHTML = TASKS.map(t => `<div class="task
 
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-tab]'); if (t){ S.tab = t.dataset.tab; S.page = null; render(); return; }
+  const cp = e.target.closest('[data-copy]'); if (cp){ try { navigator.clipboard.writeText(cp.dataset.copy).then(() => toast('已複製，可以貼上回覆'), () => toast('無法複製，請長按文字')); } catch (err) { toast('無法複製，請長按文字'); } return; }
   const cs = e.target.closest('[data-case]'); if (cs){ const [t, id] = cs.dataset.case.split('|'); openCase(t, id); return; }
   const ch = e.target.closest('[data-chat]'); if (ch){ openChat(ch.dataset.chat); return; }
   const dl = e.target.closest('[data-del]'); if (dl){ const id = dl.dataset.del; S.chats = S.chats.filter(c => c.id !== id); if (S.cur === id) newChat(); save(); renderDrawer(); if (S.tab === 'chat' || S.tab === 'home') render(false); toast('已刪除這筆紀錄'); return; }
