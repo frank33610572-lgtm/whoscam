@@ -101,6 +101,26 @@ a.btn{text-decoration:none;margin-top:10px}
 .tip{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;background:var(--sub);border-radius:22px;padding:14px;margin:12px 0 4px}
 .tip .si{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--ambersoft);color:var(--amber)}
 .tip p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.5}.tip small{color:var(--mute);font-size:13px}
+.pagev{background:var(--chat)}
+.pagev .card{background:var(--card);border:1px solid var(--line)}
+.tabs button svg{box-sizing:content-box;padding:3px 16px;border-radius:99px;transition:background .2s}
+.tabs button[aria-current=page] svg{background:var(--brandsoft)}
+.hero{position:relative;overflow:hidden}.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:#ffffff1a}
+.hero>*{position:relative;z-index:1}
+.btn.line{background:#06c755;color:#fff;text-decoration:none;margin-top:4px}
+.invbox{background:var(--sub);border-radius:12px;padding:8px 12px;font:13px/1.4 ui-monospace,monospace;word-break:break-all;color:var(--mute);margin-top:10px}
+.step{background:var(--sub);border-radius:16px;padding:12px 14px;margin-bottom:10px;display:grid;gap:4px}.step b{font-size:16px}.step span{font-size:14px;color:var(--mute)}.step .btn{justify-self:start;margin-top:4px}
+.joinill{width:72px;height:72px;border-radius:22px;background:var(--brandsoft);color:var(--brand);display:grid;place-items:center;margin:4px auto 10px}.joinill svg{width:40px;height:40px}
+.famhero{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:12px 16px 12px 8px;margin:8px 0 2px}
+.famhero b{display:block;font-size:18px;line-height:1.35}.famhero span{font-size:14px;color:var(--mute)}.famill{width:110px;height:82px}
+.gcard{width:100%;display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px 14px;margin-bottom:10px;color:var(--ink)}
+.gcard.hot{border-color:var(--red);background:var(--redsoft)}.gcard b{display:block;font-size:16.5px}.gcard b em{font-style:normal;font-weight:500;color:var(--mute);font-size:13px;margin-left:6px}.gcard>span>span{font-size:13.5px;color:var(--mute)}
+.face.sm{width:48px;height:48px;font-size:19px}.face .st.gone{background:var(--mute)}
+.dot{min-width:24px;height:24px;border-radius:99px;background:var(--fillred);color:#fff;font:700 13px/24px Inter,sans-serif;text-align:center;padding:0 6px}
+.alr{background:var(--redsoft);border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:14.5px}.alr.test{background:var(--sub)}.alr small{color:var(--mute);font-size:12.5px}.alr b{display:block;font-size:15.5px}
+.homealert{width:100%;display:grid;grid-template-columns:40px 1fr 22px;gap:10px;align-items:center;text-align:left;background:var(--fillred);color:#fff;border:0;border-radius:20px;padding:12px 14px;margin:8px 0 4px;animation:pop .4s}
+.homealert svg:first-child{width:28px;height:28px}.homealert b{display:block;font-size:16.5px}.homealert span span{font-size:13.5px;opacity:.92}
+@keyframes pop{from{transform:scale(.96);opacity:0}}
 .mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
 .mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
 .me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
@@ -157,7 +177,7 @@ h2.hi{font-size:26px;line-height:1.2;font-weight:900;margin:10px 0 4px}
 .face.empty{border:2px dashed var(--line);color:var(--mute)}
 .face .st{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;border:3px solid var(--bg);background:var(--green)}
 .face .st.wait{background:var(--amber)}
-.slot .face{color:#fff}.slot .face.empty{color:var(--mute)}.slot b{font-size:14.5px}.slot span{font-size:12.5px;color:var(--mute)}
+.slot .face{color:#fff;font-size:27px}.slot .face.empty{color:var(--mute)}.slot b{font-size:14.5px}.slot span{font-size:12.5px;color:var(--mute)}
 .sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px}
 .sw:first-child{border-top:0}
 .sw input{appearance:none;width:52px;height:32px;border-radius:99px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:.2s}
@@ -304,7 +324,7 @@ const TASKS = [['t1','檢查一段可疑對話，照建議做下一步','傳截�
 const COLORS = ['#4f46e5','#0e9f6e','#d97706','#db2777'];
 
 const fresh = () => ({tab:'home', tip:Math.floor(Math.random() * 6), page:null, msgs:[], busy:false, shots:[], result:null, flow:null,
-  circle:[{id:1,name:'志明',rel:'弟弟',status:'active',c:0}], trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
+  circle:/[?&]demo/.test(location.search) ? [{id:1,name:'志明',rel:'弟弟',status:'active',c:0}] : [], me:'', guarding:[], synced:0, trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
   rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
 let S = fresh();
 let SAMPLE = null, TTS = null, DICT = null;
@@ -410,14 +430,6 @@ async function handleShots(files){
     const why = e && e.code === 'not_granted' ? '你還沒有允許原型使用 Claude，所以我讀不到截圖。' : e && e.code === 'empty' ? '截圖裡沒有讀到對話文字，換一張清楚一點的試試。' : e && e.code === 'offline' ? '需要網路才能下載截圖辨識的字庫。' : !SAMPLE ? '這張截圖沒有讀成功。' : '這次沒有讀成功。';
     bot({kind:'text', text:[why, '你也可以把對話文字複製貼上給我。']}); chips([{t:'再傳一次截圖', a:'shot', ic:'img'}, {t:'改用貼上文字', a:'paste', ic:'text'}, {t:'試試範例', a:'examples'}]); render(); }
 }
-function fireCircle(reason, manual){
-  const act = S.circle.filter(m => m.status === 'active'); if (!act.length || S.paused) return false;
-  const r = S.result; const kind = r && r.type && r.type !== '一般對話' ? '疑似' + r.type.replace(/^疑似/, '') : '可疑狀況';
-  const body = `你關心的家人剛遇到${kind}${S.share && r ? '（' + r.names.slice(0, 3).join('、') + '）' : ''}，打個電話問候吧。`;
-  S.log.unshift({to:act.map(m => m.name).join('、'), reason, t:new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'})});
-  notify(`已通知 ${act.map(m => m.name).join('、')}`, body); return true;
-}
-
 // ---------- recover flow ----------
 function acctOf(){ const r = S.result; if (!r) return ''; const m = r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/); return m ? m[0] : ''; }
 function attachList(){ const R = S.rec, list = []; S.shots.forEach((u, i) => list.push({k:'img', u, n:`截圖 ${i + 1}`}));
@@ -556,13 +568,15 @@ function render(bottom){
     const b = $('#back'); if (b) b.onclick = () => { if (S.timer){ clearInterval(S.timer); S.timer = null; } S.page = null; render(); };
     if (bottom !== false) $('#view').scrollTop = 0;
   }
+  save();
 }
 
 const TIPS = ['檢警不會用電話要你交錢，也不會要你把帳戶交給他們「監管」。', '投資說「保證獲利、穩賺不賠」，一定是詐騙。', 'ATM 和網路銀行都沒有「解除分期付款」的功能。', '對方要你保密、不准告訴家人，就是最危險的訊號。', '朋友換了新號碼來借錢，先打他原本的號碼確認。', '不要離開購物平台私下交易，也不要點陌生的付款連結。'];
 const HOME = {title:() => 'Whoscam', html:() => {
   const hr = new Date().getHours(), hi = hr < 11 ? '早安' : hr < 18 ? '午安' : '晚安';
   const act = S.circle.filter(m => m.status === 'active'), done = Object.keys(S.done).length, r = S.result;
-  return `<div class="hhello"><span>${hi}，歡迎回來</span><h2 class="hi">今天有收到可疑訊息嗎？</h2></div>
+  const hot = []; S.guarding.forEach(g => g.alerts.filter(a => !a.seen && !a.test).forEach(a => hot.push({g, a})));
+  return `${hot.length ? `<button class="homealert" data-tab="family">${I('sos')}<span><b>${esc(hot[0].g.name)} 可能遇到詐騙</b><span>${esc(hot[0].a.msg)}</span></span>${I('chev')}</button>` : ''}<div class="hhello"><span>${hi}${S.me ? '，' + esc(S.me) : '，歡迎回來'}</span><h2 class="hi">今天有收到可疑訊息嗎？</h2></div>
   <div class="hero"><b>檢查可疑對話</b><div class="ht">傳截圖或貼上文字，30 秒告訴你風險和下一步</div>
     <div class="heroB"><button data-act="shot" data-label="">${I('img')}傳截圖</button><button data-act="paste" data-label="我要貼上文字">${I('text')}貼上文字</button></div>
     <button class="heroL" data-act="examples" data-label="試試範例">沒有對話？試試範例</button></div>
@@ -571,32 +585,179 @@ const HOME = {title:() => 'Whoscam', html:() => {
   <div class="sec"><h3>所有功能</h3></div>
   <div class="tiles">
     <button class="tile" data-tab="chat"><span class="si">${I('chat')}</span><b>問 Whoscam</b><span>用聊天的方式問，像問朋友一樣</span></button>
-    <button class="tile g" data-tab="family"><span class="si">${I('people')}</span><b>家人守護圈</b><span>${S.paused ? '暫停中' : act.length ? '守護中 · ' + esc(act.map(m => m.name).join('、')) : '邀請家人，出事時通知他們'}</span></button>
+    <button class="tile g" data-tab="family"><span class="si">${I('people')}</span><b>家人守護圈</b><span>${S.paused ? '暫停中' : act.length ? '守護中 · ' + esc(act.map(m => m.name).join('、')) : S.guarding.length ? '你正在守護 ' + esc(S.guarding.map(g => g.name).join('、')) : '邀請家人，出事時通知他們'}</span></button>
     <button class="tile a" data-tab="learn"><span class="si">${I('film')}</span><b>防詐小劇場</b><span>看完 ${done}/4 部 · ${S.pts} 點可換好禮</span></button>
     <a class="tile r" href="tel:165"><span class="si">${I('phone')}</span><b>撥打 165</b><span>反詐騙專線，24 小時都能打</span></a>
   </div>
   <div class="tip"><span class="si">${I('bulb')}</span><div><small>今日防詐小知識</small><p>${TIPS[S.tip % TIPS.length]}</p><button class="link" id="nexttip">換一則 →</button></div></div>`; },
   after:() => { $('#nexttip').onclick = () => { S.tip++; render(false); }; }};
+// ---------- real family circle (ntfy.sh) ----------
+const NTFY = 'https://ntfy.sh', BASE = location.origin + location.pathname, DEMO = /[?&]demo/.test(location.search);
+const STORE = 'whoscam-store-v1', KEEP = ['me', 'circle', 'guarding', 'trig', 'share', 'paused', 'pts', 'today', 'done', 'codes', 'log', 'tip'];
+function save(){ try { const o = {}; KEEP.forEach(k => o[k] = S[k]); localStorage.setItem(STORE, JSON.stringify(o)); } catch (e) {} }
+function load(){ try { const o = JSON.parse(localStorage.getItem(STORE) || 'null'); if (o) KEEP.forEach(k => { if (o[k] !== undefined) S[k] = o[k]; }); } catch (e) {} }
+const rid = () => { const a = new Uint8Array(16); crypto.getRandomValues(a); return 'whoscam-' + [...a].map(x => (x % 36).toString(36)).join(''); };
+const b64e = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
+async function pub(topic, message, opt = {}){
+  const r = await fetch(NTFY + '/', {method:'POST', body:JSON.stringify(Object.assign({topic, message}, opt))});
+  if (!r.ok) throw new Error('ntfy ' + r.status); return r.json();
+}
+async function pull(topic, since){
+  const r = await fetch(`${NTFY}/${topic}/json?poll=1&since=${since || 'all'}`); if (!r.ok) throw new Error('ntfy ' + r.status);
+  return (await r.text()).split('\n').filter(Boolean).map(l => { try { return JSON.parse(l); } catch (e) { return null; } }).filter(m => m && m.event === 'message');
+}
+const has = (m, t) => Array.isArray(m.tags) && m.tags.includes(t);
+const when = t => new Date(t * 1000).toLocaleString('zh-TW', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+function sysNotify(title, body, tag){
+  try { if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const o = {body, icon:'icons/icon-192.png', tag};
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) navigator.serviceWorker.ready.then(r => r.showNotification(title, o)); else new Notification(title, o);
+  } catch (e) {}
+}
+function inviteLink(m){ return `${BASE}#join=${b64e(JSON.stringify({t:m.topic, n:S.me || '家人', r:m.rel}))}`; }
+function inviteText(m){ return `${S.me || '我'} 邀請你加入 Whoscam 家人守護圈：之後他遇到詐騙風險時，你的手機會收到通知。點連結按「同意加入」：\n${inviteLink(m)}`; }
+function shareSheet(m){
+  const txt = inviteText(m);
+  sheet(`<h3>把邀請傳給${esc(m.name)}</h3><p class="lede">${esc(m.name)}打開連結、按「同意加入」後，這裡會自動變成「守護中」。</p>
+  <a class="btn line" href="https://line.me/R/msg/text/?${encodeURIComponent(txt)}" target="_blank" rel="noopener">用 LINE 傳送</a>
+  ${navigator.share ? '<button class="btn soft" id="nshare" style="margin-top:10px">其他方式分享</button>' : ''}
+  <button class="btn plain" id="ncopy" style="margin-top:10px">${I('copy')}複製邀請連結</button>
+  <div class="invbox">${esc(inviteLink(m))}</div>
+  <button class="btn plain" id="nrm" style="margin-top:14px;color:var(--red)">取消這個邀請</button>`);
+  const sh = $('#nshare'); if (sh) sh.onclick = () => navigator.share({title:'Whoscam 家人守護圈', text:txt}).catch(() => {});
+  $('#ncopy').onclick = () => { try { navigator.clipboard.writeText(txt).then(() => toast('已複製，貼到 LINE 或簡訊傳給家人'), () => toast('無法複製，請長按連結')); } catch (e) { toast('無法複製，請長按連結'); } };
+  $('#nrm').onclick = () => { S.circle = S.circle.filter(x => x !== m); closeSheet(); toast('已取消邀請'); render(); };
+}
+function fireCircle(reason, manual){
+  const act = S.circle.filter(m => m.status === 'active'); if (!act.length || S.paused) return false;
+  const r = S.result; const kind = r && r.type && r.type !== '一般對話' ? '疑似' + r.type.replace(/^疑似/, '') : '可疑狀況';
+  const who = S.me || '你關心的家人';
+  const body = manual ? `${who}請你幫忙看一下可疑訊息，方便時打個電話給他。` : `${who}剛遇到${kind}${S.share && r && r.names.length ? '（' + r.names.slice(0, 3).join('、') + '）' : ''}，打個電話問候吧。`;
+  const title = manual ? `Whoscam：${who}需要你幫忙` : `Whoscam：${who}可能遇到詐騙`;
+  const t = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'});
+  const real = act.filter(m => m.topic);
+  S.log.unshift({to:act.map(m => m.name).join('、'), reason, t}); S.log = S.log.slice(0, 20);
+  notify(`${real.length ? '正在通知' : '已通知'} ${act.map(m => m.name).join('、')}`, body);
+  Promise.allSettled(real.map(m => pub(m.topic, body, {title, tags:['warning', 'whoscam-alert'], priority:4, click:BASE}))).then(rs => {
+    const bad = rs.filter(x => x.status === 'rejected').length;
+    if (real.length) toast(bad ? `有 ${bad} 位家人沒送出，請檢查網路` : `已送到 ${real.map(m => m.name).join('、')} 的手機`);
+    if (bad) { S.log[0].fail = bad; render(false); }
+  });
+  return true;
+}
+let syncing = false;
+async function sync(){
+  if (syncing || !navigator.onLine) return; syncing = true; let changed = false;
+  try {
+    for (const m of S.circle.filter(x => x.topic)){
+      let ms; try { ms = await pull(m.topic, m.lastId); } catch (e) { continue; }
+      for (const x of ms){ m.lastId = x.id;
+        if (has(x, 'whoscam-join') && m.status === 'pending'){ m.status = 'active'; S.accepted = true; changed = true; notify(`${m.name} 已加入守護圈`, '之後你遇到高風險時，他的手機會收到通知。'); sysNotify(`${m.name} 已加入守護圈`, '之後你遇到高風險時，他會收到通知。', x.id); }
+        if (has(x, 'whoscam-quit')){ m.status = 'left'; changed = true; notify(`${m.name} 已退出守護圈`, '你可以重新邀請他。'); }
+      }
+    }
+    for (const g of S.guarding){
+      let ms; try { ms = await pull(g.topic, g.lastId); } catch (e) { continue; }
+      for (const x of ms){ g.lastId = x.id;
+        if ((has(x, 'whoscam-alert') || has(x, 'whoscam-test')) && !g.alerts.some(a => a.id === x.id)){
+          g.alerts.unshift({id:x.id, time:x.time, title:x.title || 'Whoscam', msg:x.message, test:has(x, 'whoscam-test'), seen:false}); g.alerts = g.alerts.slice(0, 30); changed = true;
+          notify(x.title || 'Whoscam 守護圈', x.message); if (document.hidden) sysNotify(x.title || 'Whoscam 守護圈', x.message, x.id);
+        }
+        if (has(x, 'whoscam-left')){ g.removed = true; changed = true; }
+      }
+    }
+    S.synced = Date.now();
+  } finally { syncing = false; }
+  if (changed) render(false); else save();
+}
+function checkJoin(){
+  const mt = location.hash.match(/#join=([\w-]+)/); if (!mt) return;
+  history.replaceState(null, '', BASE + location.search);
+  let inv; try { inv = JSON.parse(b64d(mt[1])); } catch (e) { toast('邀請連結不完整，請對方重新傳一次'); return; }
+  if (!inv || !/^whoscam-[a-z0-9]{8,40}$/.test(inv.t || '')) { toast('邀請連結不完整，請對方重新傳一次'); return; }
+  if (S.circle.some(m => m.topic === inv.t)) { toast('這是你自己發出的邀請，請傳給家人打開'); return; }
+  const old = S.guarding.find(g => g.topic === inv.t); if (old && !old.removed) { S.tab = 'family'; render(); toast(`你已經在守護 ${old.name}`); return; }
+  const name = String(inv.n || '家人').slice(0, 12), rel = String(inv.r || '').slice(0, 6);
+  sheet(`<div class="joinill">${I('shield')}</div><h3 style="text-align:center">${esc(name)} 邀請你加入守護圈</h3>
+  <p class="lede" style="text-align:center">之後 ${esc(name)} 遇到詐騙風險時，你的手機會收到通知，可以打電話關心。你<b>看不到</b>他的對話和帳戶。</p>
+  <label class="lede" style="display:block;margin:0 0 6px">你的稱呼（${esc(name)}會看到）</label><input type="text" id="jname" maxlength="8" value="${esc(S.me || '')}" placeholder="例如：小明、媽媽">
+  <button class="btn" id="jok" style="margin-top:14px">同意加入</button><button class="btn plain" data-close style="margin-top:10px">先不要</button>`);
+  $('#jok').onclick = async () => { const me = $('#jname').value.trim(); if (!me) { toast('請輸入你的稱呼'); return; }
+    $('#jok').disabled = true; $('#jok').textContent = '連線中…';
+    try { const x = await pub(inv.t, `${me} 已加入守護圈。之後 ${name} 遇到詐騙風險時，你會收到通知。`, {title:'Whoscam 守護圈', tags:['white_check_mark', 'whoscam-join']});
+      S.me = S.me || me; S.guarding = S.guarding.filter(g => g.topic !== inv.t); S.guarding.push({topic:inv.t, name, rel, joined:Date.now(), lastId:x.id, alerts:[]});
+      S.tab = 'family'; S.page = null; closeSheet(); render(); setTimeout(() => notifySetup(S.guarding.at(-1)), 350);
+    } catch (e) { $('#jok').disabled = false; $('#jok').textContent = '同意加入'; toast('連線失敗，請確認網路後再試一次'); } };
+}
+function notifySetup(g){
+  const can = 'Notification' in window, on = can && Notification.permission === 'granted';
+  sheet(`<h3>已加入 ${esc(g.name)} 的守護圈</h3><p class="lede">選一種方式收通知，建議兩個都做：</p>
+  <div class="step"><b>1. 打開 Whoscam 時跳出通知</b><span>${on ? '已開啟' : can ? '按下面的按鈕，選「允許」' : '這個瀏覽器不支援，請用第 2 種'}</span>${can && !on ? '<button class="btn soft small" id="nperm">允許通知</button>' : ''}</div>
+  <div class="step"><b>2. App 關著也收得到（推薦）</b><span>安裝免費的 ntfy App，按 ＋ 訂閱這個頻道：</span><div class="invbox" style="margin:6px 0">${esc(g.topic)}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn plain small" id="ntopic">${I('copy')}複製頻道</button><a class="btn plain small" href="https://ntfy.sh/app" target="_blank" rel="noopener" style="margin:0">下載 ntfy App</a></div></div>
+  <button class="btn" data-close style="margin-top:12px">完成</button>`);
+  const np = $('#nperm'); if (np) np.onclick = () => Notification.requestPermission().then(p => { toast(p === 'granted' ? '已開啟通知' : '沒有開啟通知'); notifySetup(g); });
+  $('#ntopic').onclick = () => { try { navigator.clipboard.writeText(g.topic).then(() => toast('已複製頻道名稱')); } catch (e) {} };
+}
+function guardSheet(g){
+  g.alerts.forEach(a => a.seen = true);
+  sheet(`<h3>${esc(g.name)}${g.rel ? `（你的${esc(g.rel)}）` : ''}</h3><p class="lede">${g.removed ? `${esc(g.name)} 已將你移出守護圈。` : `加入於 ${new Date(g.joined).toLocaleDateString('zh-TW')}，有狀況時你會收到通知。`}</p>
+  <div class="sec" style="margin-top:6px"><h3>通知紀錄</h3></div>
+  ${g.alerts.length ? g.alerts.map(a => `<div class="alr ${a.test ? 'test' : ''}"><small>${when(a.time)}${a.test ? ' · 測試' : ''}</small><b>${esc(a.title)}</b><div>${esc(a.msg)}</div></div>`).join('') : '<div class="card"><div class="lede" style="margin:0">目前一切平安，還沒有通知。</div></div>'}
+  ${g.removed ? '' : '<button class="btn soft" id="gset" style="margin-top:12px">收不到通知？設定方式</button>'}
+  <button class="btn plain" id="gquit" style="margin-top:10px;color:var(--red)">${g.removed ? '刪除' : '退出守護'}</button>`);
+  const gs = $('#gset'); if (gs) gs.onclick = () => notifySetup(g);
+  $('#gquit').onclick = async () => { if (!g.removed) { try { await pub(g.topic, `${S.me || '家人'} 已退出守護圈`, {tags:['whoscam-quit'], title:'Whoscam 守護圈'}); } catch (e) {} }
+    S.guarding = S.guarding.filter(x => x !== g); closeSheet(); toast(g.removed ? '已刪除' : `已退出 ${g.name} 的守護圈`); render(); };
+  save(); render(false);
+}
+function nameSheet(after){
+  sheet(`<h3>家人會怎麼稱呼你？</h3><p class="lede">這個名字會出現在給家人的邀請和通知裡。</p><input type="text" id="mename" maxlength="8" value="${esc(S.me || '')}" placeholder="例如：小美、媽媽"><button class="btn" id="mesave" style="margin-top:14px">確定</button>`);
+  $('#mesave').onclick = () => { const v = $('#mename').value.trim(); if (!v) { toast('請輸入稱呼'); return; } S.me = v; closeSheet(); render(); if (after) setTimeout(after, 300); };
+  setTimeout(() => $('#mename') && $('#mename').focus(), 250);
+}
+const famIll = `<svg viewBox="0 0 120 90" class="famill" aria-hidden="true"><circle cx="38" cy="34" r="14" fill="#c7d2fe"/><path d="M14 80c2-16 12-24 24-24s22 8 24 24z" fill="#c7d2fe"/><circle cx="84" cy="30" r="16" fill="#a5b4fc"/><path d="M58 80c2-18 13-27 26-27s24 9 26 27z" fill="#a5b4fc"/><path d="M60 8l16 6v12c0 10-7 16-16 19-9-3-16-9-16-19V14z" fill="#4f46e5"/><path d="M53 26l5 5 9-10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const FAMILY = {title:() => '家人守護圈', html:() => {
-  const slots = [0, 1, 2].map(i => { const m = S.circle[i]; return m ? `<button class="slot" data-mem="${m.id}"><span class="face" style="background:${COLORS[m.c]}">${esc(m.name.slice(-1))}<span class="st ${m.status === 'pending' ? 'wait' : ''}"></span></span><b>${esc(m.name)}</b><span>${m.status === 'pending' ? '等待同意' : esc(m.rel)}</span></button>` : `<button class="slot" data-add><span class="face empty">${I('plus', 'style="width:30px;height:30px"')}</span><b>邀請</b><span>空位</span></button>`; }).join('');
-  return `<h2 class="hi">出事時，讓家人知道</h2><p class="lede">最多 3 位。他們只會收到「你需要幫忙」，看不到你的對話。</p><div class="faces">${slots}</div>
-  ${S.circle.some(m => m.status === 'pending') ? `<button class="btn soft" id="sim">模擬：對方在手機上按「同意」</button>` : ''}
-  <div class="sec"><h3>什麼時候通知</h3></div><div class="card" style="padding-top:2px;padding-bottom:2px">${[['high', '檢查結果是高風險'], ['recover', '我按下「我被騙了」'], ['ask', '我按「請家人幫我看」']].map(t => `<label class="sw">${t[1]}<input type="checkbox" role="switch" data-trig="${t[0]}" ${S.trig[t[0]] ? 'checked' : ''}></label>`).join('')}<label class="sw">通知附上警訊名稱<input type="checkbox" role="switch" id="share" ${S.share ? 'checked' : ''}></label></div>
-  <div class="sec"><h3>他們會收到</h3></div><div class="pv"><span class="logo">W</span><div><b>Whoscam 守護圈</b><div>你關心的家人剛遇到疑似假投資${S.share ? '（保證獲利、要你保密）' : ''}，打個電話問候吧。</div></div></div>
-  <div class="sec"><h3>家人能做什麼</h3></div><div class="cando card"><div><b>可以</b><ul><li><span class="y">✓</span> 打電話關心</li><li><span class="y">✓</span> 替你送出求助</li></ul></div><div><b>不可以</b><ul><li><span class="n">✕</span> 看你的帳戶</li><li><span class="n">✕</span> 凍結交易</li><li><span class="n">✕</span> 讀你的對話</li></ul></div></div>
-  <button class="btn plain" id="pause">${S.paused ? '恢復守護' : '暫停通知 24 小時'}</button>
-  <div class="card" style="margin-top:12px"><b>也到銀行設定「指定聯絡人」</b><div class="lede" style="margin:4px 0 0;font-size:14.5px">已有 24 家銀行開辦：解定存或大額匯款時，銀行會通知你指定的家人。</div></div>
-  <div class="card"><b>通知紀錄（只有你看得到）</b>${S.log.map(l => `<div class="lede" style="margin:4px 0 0;font-size:14px">${l.t}　${esc(l.to)}：${esc(l.reason)}</div>`).join('') || '<div class="lede" style="margin:4px 0 0;font-size:14px">還沒有通知</div>'}</div>`; },
+  const act = S.circle.filter(m => m.status === 'active');
+  const slots = [0, 1, 2].map(i => { const m = S.circle[i]; return m ? `<button class="slot" data-mem="${m.id}"><span class="face" style="background:${COLORS[m.c] || COLORS[0]}">${esc(m.name.slice(-1))}<span class="st ${m.status === 'pending' ? 'wait' : m.status === 'left' ? 'gone' : ''}"></span></span><b>${esc(m.name)}</b><span>${m.status === 'pending' ? '等對方加入' : m.status === 'left' ? '已退出' : '守護中'}</span></button>` : `<button class="slot" data-add><span class="face empty">${I('plus', 'style="width:30px;height:30px"')}</span><b>邀請家人</b><span>空位</span></button>`; }).join('');
+  const gl = S.guarding.map((g, i) => { const a = g.alerts.find(x => !x.test) || g.alerts[0]; const un = g.alerts.filter(x => !x.seen && !x.test).length;
+    return `<button class="gcard ${un ? 'hot' : ''}" data-g="${i}"><span class="face sm" style="background:${COLORS[(i + 1) % 4]}">${esc(g.name.slice(-1))}</span><span><b>${esc(g.name)}${g.rel ? `<em>${esc(g.rel)}</em>` : ''}</b><span>${g.removed ? '已將你移出守護圈' : a ? `${when(a.time)}　${esc(a.test ? '測試通知' : a.title.replace(/^Whoscam：/, ''))}` : '目前一切平安'}</span></span>${un ? `<span class="dot">${un}</span>` : I('chev')}</button>`; }).join('');
+  return `<div class="famhero">${famIll}<div><b>出事時，讓家人第一時間知道</b><span>家人只會收到「需要幫忙」的通知，看不到你的對話和帳戶。</span></div></div>
+  <div class="sec"><h3>守護我的人</h3><span class="lede" style="margin:0;font-size:13.5px">${act.length}/3 位守護中</span></div>
+  <div class="card"><div class="faces">${slots}</div><div class="lede" style="text-align:center;font-size:13.5px;margin:4px 0 0">${S.me ? `家人看到的你是「${esc(S.me)}」　<button class="link" id="rename" style="min-height:32px;font-size:13.5px">修改</button>` : '點「邀請家人」，用 LINE 傳邀請連結'}</div></div>
+  ${act.some(m => m.topic) ? `<button class="btn soft" id="testn">${I('send')}傳一則測試通知給家人</button>` : ''}
+  ${DEMO && S.circle.some(m => m.status === 'pending' && !m.topic) ? '<button class="btn soft" id="sim">模擬：對方按「同意」</button>' : ''}
+  <div class="sec"><h3>我守護的人</h3>${S.synced ? `<span class="lede" style="margin:0;font-size:13px">${new Date(S.synced).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'})} 已同步</span>` : ''}</div>
+  ${gl || '<div class="card"><b>還沒有人邀請你</b><div class="lede" style="margin:4px 0 0;font-size:14.5px">家人傳邀請連結給你，打開後按「同意加入」，就會出現在這裡。</div></div>'}
+  <div class="sec"><h3>什麼時候通知家人</h3></div><div class="card" style="padding-top:2px;padding-bottom:2px">${[['high', '檢查結果是高風險'], ['recover', '我按下「我被騙了」'], ['ask', '我按「請家人幫我看」']].map(t => `<label class="sw">${t[1]}<input type="checkbox" role="switch" data-trig="${t[0]}" ${S.trig[t[0]] ? 'checked' : ''}></label>`).join('')}<label class="sw">通知附上警訊名稱<input type="checkbox" role="switch" id="share" ${S.share ? 'checked' : ''}></label></div>
+  <div class="sec"><h3>家人手機會收到</h3></div><div class="pv"><span class="logo">W</span><div><b>Whoscam：${esc(S.me || '你關心的家人')}可能遇到詐騙</b><div>${esc(S.me || '你關心的家人')}剛遇到疑似假投資${S.share ? '（保證獲利、要你保密）' : ''}，打個電話問候吧。</div></div></div>
+  <div class="sec"><h3>家人能做什麼</h3></div><div class="cando card"><div><b>可以</b><ul><li><span class="y">✓</span> 收到通知</li><li><span class="y">✓</span> 打電話關心</li></ul></div><div><b>不可以</b><ul><li><span class="n">✕</span> 看你的帳戶</li><li><span class="n">✕</span> 凍結交易</li><li><span class="n">✕</span> 讀你的對話</li></ul></div></div>
+  <button class="btn plain" id="pause">${S.paused ? '恢復守護' : '暫停通知'}</button>
+  <div class="card" style="margin-top:12px"><b>也到銀行設定「指定聯絡人」</b><div class="lede" style="margin:4px 0 0;font-size:14.5px">很多銀行已開辦：解定存或大額匯款時，銀行會通知你指定的家人。</div></div>
+  <div class="card"><b>通知紀錄（只有你看得到）</b>${S.log.map(l => `<div class="lede" style="margin:4px 0 0;font-size:14px">${l.t}　${esc(l.to)}：${esc(l.reason)}${l.fail ? '（有人沒送出）' : ''}</div>`).join('') || '<div class="lede" style="margin:4px 0 0;font-size:14px">還沒有通知</div>'}</div>
+  <p class="lede" style="font-size:12.5px;margin-top:10px">通知透過開源推播服務 ntfy.sh 傳送，只包含名字和詐騙類型，不含對話內容。</p>`; },
   after:() => {
-    $$('[data-add]').forEach(b => b.onclick = () => { sheet(`<h3>邀請家人加入</h3><p class="lede">對方按「同意」後才開始守護。</p><input type="text" id="nm" placeholder="怎麼稱呼？例如：媽媽" maxlength="8"><div class="rels">${['母親', '父親', '子女', '配偶', '兄弟姊妹', '朋友'].map(r => `<button data-rel="${r}" aria-pressed="${S.invRel === r}">${r}</button>`).join('')}</div><button class="btn" id="send" style="margin-top:16px">傳送邀請</button>`);
+    const invite = () => {
+      sheet(`<h3>邀請家人加入</h3><p class="lede">對方打開連結、按「同意加入」後才開始守護。</p><input type="text" id="nm" placeholder="怎麼稱呼他？例如：媽媽、志明" maxlength="8"><div class="rels">${['母親', '父親', '子女', '配偶', '兄弟姊妹', '朋友'].map(r => `<button data-rel="${r}" aria-pressed="${S.invRel === r}">${r}</button>`).join('')}</div><button class="btn" id="send" style="margin-top:16px">產生邀請連結</button>`);
       $$('[data-rel]').forEach(x => x.onclick = () => { S.invRel = x.dataset.rel; $$('[data-rel]').forEach(y => y.setAttribute('aria-pressed', y === x)); });
-      $('#send').onclick = () => { const n = $('#nm').value.trim(); if (!n){ toast('請輸入稱呼'); return; } S.circle.push({id:Date.now(), name:n, rel:S.invRel, status:'pending', c:[0, 1, 2, 3].find(i => !S.circle.some(m => m.c === i))}); closeSheet(); toast(`已傳送邀請給 ${n}`); render(); }; setTimeout(() => $('#nm') && $('#nm').focus(), 250); });
-    const sim = $('#sim'); if (sim) sim.onclick = () => { const m = S.circle.find(x => x.status === 'pending'); m.status = 'active'; S.accepted = true; notify(`${m.name} 已加入守護圈`, '之後遇到高風險時，他會收到通知。'); render(); };
-    $$('[data-mem]').forEach(b => b.onclick = () => { const m = S.circle.find(x => x.id == b.dataset.mem); sheet(`<h3>${esc(m.name)}（${esc(m.rel)}）</h3><p class="lede">${m.status === 'pending' ? '還在等對方同意。' : '已同意，高風險時會收到通知。'}</p><button class="btn red" id="rm">移出守護圈</button><button class="btn plain" data-close style="margin-top:10px">取消</button>`);
-      $('#rm').onclick = () => { S.circle = S.circle.filter(x => x !== m); closeSheet(); toast(`已移除 ${m.name}`); if (S.accepted) tick('t2'); render(); }; });
-    $$('[data-trig]').forEach(c => c.onchange = () => { S.trig[c.dataset.trig] = c.checked; });
-    $('#share').onchange = e => { S.share = e.target.checked; render(); };
-    $('#pause').onclick = () => { S.paused = !S.paused; if (S.paused && S.accepted) tick('t2'); toast(S.paused ? '已暫停 24 小時' : '已恢復守護'); render(); };
+      $('#send').onclick = () => { const n = $('#nm').value.trim(); if (!n){ toast('請輸入稱呼'); return; }
+        const m = {id:Date.now(), name:n, rel:S.invRel, status:'pending', topic:rid(), c:[0, 1, 2, 3].find(i => !S.circle.some(x => x.c === i))}; S.circle.push(m); render(); shareSheet(m); };
+      setTimeout(() => $('#nm') && $('#nm').focus(), 250);
+    };
+    $$('[data-add]').forEach(b => b.onclick = () => S.me ? invite() : nameSheet(invite));
+    const rn = $('#rename'); if (rn) rn.onclick = () => nameSheet();
+    const sim = $('#sim'); if (sim) sim.onclick = () => { const m = S.circle.find(x => x.status === 'pending' && !x.topic); m.status = 'active'; S.accepted = true; notify(`${m.name} 已加入守護圈`, '之後遇到高風險時，他會收到通知。'); render(); };
+    const tn = $('#testn'); if (tn) tn.onclick = () => { const real = S.circle.filter(m => m.status === 'active' && m.topic); tn.disabled = true;
+      Promise.allSettled(real.map(m => pub(m.topic, `這是 ${S.me || '家人'} 傳的測試通知：守護圈連線正常。`, {title:'Whoscam 守護圈測試', tags:['bell', 'whoscam-test']}))).then(rs => { tn.disabled = false; const bad = rs.filter(x => x.status === 'rejected').length; toast(bad ? '有家人沒送出，請檢查網路' : '測試通知已送出，請家人確認有沒有收到'); }); };
+    $$('[data-mem]').forEach(b => b.onclick = () => { const m = S.circle.find(x => x.id == b.dataset.mem); if (m.status === 'pending' && m.topic) { shareSheet(m); return; }
+      sheet(`<h3>${esc(m.name)}（${esc(m.rel)}）</h3><p class="lede">${m.status === 'left' ? '他已退出守護圈，可以移除後重新邀請。' : m.status === 'pending' ? '還在等對方同意。' : '守護中：你遇到高風險時，他的手機會收到通知。'}</p><button class="btn red" id="rm">移出守護圈</button><button class="btn plain" data-close style="margin-top:10px">取消</button>`);
+      $('#rm').onclick = () => { if (m.topic && m.status === 'active') pub(m.topic, `${S.me || '家人'} 已將你移出守護圈`, {tags:['whoscam-left'], title:'Whoscam 守護圈'}).catch(() => {});
+        S.circle = S.circle.filter(x => x !== m); closeSheet(); toast(`已移除 ${m.name}`); if (S.accepted) tick('t2'); render(); }; });
+    $$('[data-g]').forEach(b => b.onclick = () => guardSheet(S.guarding[+b.dataset.g]));
+    $$('[data-trig]').forEach(c => c.onchange = () => { S.trig[c.dataset.trig] = c.checked; save(); });
+    $('#share').onchange = e => { S.share = e.target.checked; render(false); };
+    $('#pause').onclick = () => { S.paused = !S.paused; if (S.paused && S.accepted) tick('t2'); toast(S.paused ? '已暫停通知家人' : '已恢復守護'); render(false); };
   }};
 
 const LEARN = {title:() => '防詐小劇場', html:() => { const nextR = SHOP.filter(r => r.p > S.pts).sort((a, b) => a.p - b.p)[0];
@@ -636,7 +797,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet()
 $('#shotin').onchange = e => { const f = [...e.target.files].slice(0, 10); e.target.value = ''; if (f.length){ S.tab = 'chat'; S.flow = null; handleShots(f); } };
 $('#morein').onchange = e => { [...e.target.files].slice(0, 6).forEach(f => S.rec.extra.push({k:'up', u:f.type.startsWith('image/') ? URL.createObjectURL(f) : '', n:f.name.slice(0, 30)})); e.target.value = ''; toast('已加入證據'); render(); };
 $('#reset').onclick = () => { if (S.timer) clearInterval(S.timer); closeSheet(); S = fresh(); greet(); render(); renderTasks(); toast('已重新開始'); };
-greet(); render(); renderTasks();
+load(); greet(); render(); renderTasks(); checkJoin(); sync();
+setInterval(() => { if (!document.hidden) sync(); }, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+window.addEventListener('online', () => sync());
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 </script>
