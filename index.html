@@ -47,7 +47,7 @@ svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .view{flex:1;overflow-y:auto;scroll-behavior:smooth}
 .chatv{background:var(--chat);padding:14px 12px 10px}
 .pagev{padding:6px 18px 24px}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--bg);padding:6px 4px 10px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--bg);padding:6px 4px 10px}
 .tabs button{border:0;background:none;color:var(--mute);font-size:13px;display:grid;justify-items:center;gap:2px;min-height:52px}
 .tabs button[aria-current=page]{color:var(--brand);font-weight:700}
 .tabs svg{width:24px;height:24px}
@@ -81,6 +81,26 @@ svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .resetbtn{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;padding:6px 12px;min-height:42px;font-size:15px;font-weight:700;display:flex;gap:5px;align-items:center;flex:none}
 .resetbtn svg{width:19px;height:19px}
 a.btn{text-decoration:none;margin-top:10px}
+.hhello{margin:8px 0 14px}.hhello span{color:var(--mute);font-size:15px}.hhello .hi{margin:2px 0 0}
+.hero{background:linear-gradient(135deg,var(--fill),color-mix(in srgb,var(--fill) 70%,#9333ea));color:#fff;border-radius:26px;padding:18px;box-shadow:0 18px 30px -18px color-mix(in srgb,var(--fill) 80%,transparent)}
+.hero b{display:block;font-size:21px;line-height:1.3}.hero .ht{font-size:15px;opacity:.9;margin-top:2px}
+.heroB{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.heroB button{border:0;border-radius:16px;min-height:56px;background:#fff;color:#3730a3;font-weight:800;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px}
+.heroB button+button{background:#ffffff26;color:#fff}
+.heroL{border:0;background:none;color:#fff;opacity:.9;font-weight:700;font-size:15px;min-height:44px;padding:0;margin-top:4px;text-decoration:underline;text-underline-offset:3px}
+.sosCard{width:100%;display:grid;grid-template-columns:48px 1fr 22px;gap:12px;align-items:center;text-align:left;margin-top:12px;border:1.5px solid color-mix(in srgb,var(--red) 35%,transparent);background:var(--redsoft);border-radius:22px;padding:14px;min-height:78px;color:var(--ink)}
+.sosCard .si{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:var(--fillred);color:#fff}
+.sosCard b{display:block;font-size:17.5px;color:var(--red)}.sosCard span span{font-size:14px;color:var(--mute)}
+.lastc{width:100%;display:grid;grid-template-columns:auto 1fr 22px;gap:12px;align-items:center;text-align:left;margin-top:12px;border:1.5px solid var(--line);background:var(--card);border-radius:22px;padding:12px 14px;color:var(--ink)}
+.lastc .tl{transform:scale(.8)}.lastc b{display:block;font-size:16px}.lastc span span{font-size:13.5px;color:var(--mute)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{display:grid;gap:6px;align-content:start;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:22px;padding:14px;min-height:128px;color:var(--ink);text-decoration:none}
+.tile .si{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--brandsoft);color:var(--brandink);margin-bottom:4px}
+.tile b{font-size:17px;line-height:1.3}.tile span:last-child{font-size:13.5px;color:var(--mute);line-height:1.4}
+.tile.g .si{background:var(--greensoft);color:var(--green)}.tile.a .si{background:var(--ambersoft);color:var(--amber)}.tile.r .si{background:var(--redsoft);color:var(--red)}
+.tip{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;background:var(--sub);border-radius:22px;padding:14px;margin:12px 0 4px}
+.tip .si{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--ambersoft);color:var(--amber)}
+.tip p{margin:2px 0 0;font-size:16px;font-weight:700;line-height:1.5}.tip small{color:var(--mute);font-size:13px}
 .mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
 .mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
 .me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
@@ -249,7 +269,7 @@ const P = {
   film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>', sos:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M12 8v5M12 16.2v.3"/>',
   img:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="M20 16l-5-5-8 9"/>', send:'<path d="M5 12l14-7-5 15-3-6z"/>',
   mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21"/>', phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a1 1 0 01-1 1A16 16 0 014 5a1 1 0 011-1z"/>',
-  speak:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a7.5 7.5 0 010 11"/>', check:'<path d="M5 12.5l4.5 4.5L19 7"/>', reset:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  speak:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a7.5 7.5 0 010 11"/>', check:'<path d="M5 12.5l4.5 4.5L19 7"/>', home:'<path d="M4 11l8-7 8 7v9h-5v-6h-6v6H4z"/>', chev:'<path d="M9 5l7 7-7 7"/>', bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>', reset:'<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/>', plus:'<path d="M12 5v14M5 12h14"/>',
   text:'<path d="M5 6h14M5 11h14M5 16h9"/>', shield:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>', play:'<path d="M8 5l11 7-11 7z" fill="currentColor"/>',
   back:'<path d="M15 5l-7 7 7 7"/>', copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>', edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', bank:'<path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>'
 };
@@ -283,7 +303,7 @@ const SHOP = [{id:'r1',n:'示範咖啡 中杯拿鐵',p:300},{id:'r2',n:'示範�
 const TASKS = [['t1','檢查一段可疑對話，照建議做下一步','傳截圖或點「試試範例」→ 看紅綠燈 → 按一個建議'],['t2','邀請一位家人加入守護圈，再撤回','家人守護 → 空位 + → 模擬對方同意 → 移除或暫停'],['t3','「我已經匯款了」，把報告送到銀行','按右上「我被騙了」，60 秒內送出即成功（會計時）'],['t4','看一部防詐小劇場並答對測驗','三題全對才拿到點數']];
 const COLORS = ['#4f46e5','#0e9f6e','#d97706','#db2777'];
 
-const fresh = () => ({tab:'chat', page:null, msgs:[], busy:false, shots:[], result:null, flow:null,
+const fresh = () => ({tab:'home', tip:Math.floor(Math.random() * 6), page:null, msgs:[], busy:false, shots:[], result:null, flow:null,
   circle:[{id:1,name:'志明',rel:'弟弟',status:'active',c:0}], trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
   rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
 let S = fresh();
@@ -435,9 +455,10 @@ function bankSheet(){ const att = attachList();
 function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('已複製報告'), () => toast('無法複製，請長按文字手動複製')); } catch (e) { toast('無法複製，請長按文字手動複製'); } }
 
 async function act(a){
+  if (S.tab !== 'chat' && ['paste', 'sos', 'examples', 'paid'].includes(a)){ S.tab = 'chat'; S.page = null; }
   const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start') && a !== 'shot') last.used = true;
   const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full', 'reset'].includes(a)) me({kind:'text', text:[label]});
-  if (a === 'reset'){ S.msgs = []; S.result = null; S.flow = null; S.shots = []; S.rec = null; S.busy = false; greet(); render(); toast('已回到開始畫面'); return; }
+  if (a === 'reset'){ S.msgs = []; S.result = null; S.flow = null; S.shots = []; S.rec = null; S.busy = false; greet(); S.tab = 'home'; S.page = null; render(); toast('已回到首頁'); return; }
   if (a === 'shot'){ $('#shotin').click(); render(); return; }
   if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
   if (a === 'examples'){ bot({kind:'text', text:['選一段範例對話試試看：']}); chips(SCEN.map(s => ({t:s.name, a:'ex:' + s.id}))); render(true); return; }
@@ -514,7 +535,7 @@ function msgHTML(m, i){
   else if (m.kind === 'status'){ const R = S.rec; body = `<div class="stat"><b>案件 ${esc(R.caseNo || '')}</b> · 用時 ${R.secs} 秒<ol>${['示範銀行 A 已受理', '風險複核中', '已提供帳戶保護建議'].map((s, j) => `<li class="${R.status > j ? 'on' : ''}">${s}</li>`).join('')}</ol></div>`; }
   return `<div class="row ${side}">${av}${body}</div>`;
 }
-const TABS = [['chat', '問 Whoscam', 'chat'], ['family', '家人守護', 'people'], ['learn', '防詐小劇場', 'film']];
+const TABS = [['home', '首頁', 'home'], ['chat', '問 Whoscam', 'chat'], ['family', '家人守護', 'people'], ['learn', '防詐小劇場', 'film']];
 function render(bottom){
   const act = S.circle.filter(m => m.status === 'active');
   $('#tabs').innerHTML = TABS.map(t => `<button data-tab="${t[0]}" ${S.tab === t[0] ? 'aria-current="page"' : ''}>${I(t[2])}${t[1]}</button>`).join('');
@@ -528,14 +549,34 @@ function render(bottom){
     requestAnimationFrame(() => { const v = $('#view'); const sel = S.scrollTo; S.scrollTo = null; const els = sel ? v.querySelectorAll(sel) : []; const el = els[els.length - 1]; v.scrollTop = el ? Math.max(0, el.closest('.row').offsetTop - 12) : v.scrollHeight; });
   } else {
     $('#compose').innerHTML = '';
-    const V = S.page === 'video' ? VIDEO : S.tab === 'family' ? FAMILY : LEARN;
-    $('#head').innerHTML = `${S.page ? `<button class="iconbtn" id="back" aria-label="返回">${I('back')}</button>` : ''}<div class="t"><b style="font-size:19px">${V.title()}</b></div><span class="badge" style="font-size:14px;padding:4px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</span>`;
+    const V = S.page === 'video' ? VIDEO : S.tab === 'home' ? HOME : S.tab === 'family' ? FAMILY : LEARN;
+    if (V === HOME) $('#head').innerHTML = `<div class="logo">W</div><div class="t"><b>Whoscam</b><span class="${S.paused || !act.length ? 'off' : ''}"><i></i>${S.paused ? '守護圈暫停中' : act.length ? '守護中 · ' + esc(act.map(m => m.name).join('、')) : '尚未邀請家人'}</span></div><button class="badge" data-tab="learn" style="border:0;font-size:14px;padding:6px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</button>`;
+    else $('#head').innerHTML = `${S.page ? `<button class="iconbtn" id="back" aria-label="返回">${I('back')}</button>` : ''}<div class="t"><b style="font-size:19px">${V.title()}</b></div><span class="badge" style="font-size:14px;padding:4px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</span>`;
     $('#view').className = 'view pagev'; $('#view').innerHTML = V.html(); V.after && V.after();
     const b = $('#back'); if (b) b.onclick = () => { if (S.timer){ clearInterval(S.timer); S.timer = null; } S.page = null; render(); };
     if (bottom !== false) $('#view').scrollTop = 0;
   }
 }
 
+const TIPS = ['檢警不會用電話要你交錢，也不會要你把帳戶交給他們「監管」。', '投資說「保證獲利、穩賺不賠」，一定是詐騙。', 'ATM 和網路銀行都沒有「解除分期付款」的功能。', '對方要你保密、不准告訴家人，就是最危險的訊號。', '朋友換了新號碼來借錢，先打他原本的號碼確認。', '不要離開購物平台私下交易，也不要點陌生的付款連結。'];
+const HOME = {title:() => 'Whoscam', html:() => {
+  const hr = new Date().getHours(), hi = hr < 11 ? '早安' : hr < 18 ? '午安' : '晚安';
+  const act = S.circle.filter(m => m.status === 'active'), done = Object.keys(S.done).length, r = S.result;
+  return `<div class="hhello"><span>${hi}，歡迎回來</span><h2 class="hi">今天有收到可疑訊息嗎？</h2></div>
+  <div class="hero"><b>檢查可疑對話</b><div class="ht">傳截圖或貼上文字，30 秒告訴你風險和下一步</div>
+    <div class="heroB"><button data-act="shot" data-label="">${I('img')}傳截圖</button><button data-act="paste" data-label="我要貼上文字">${I('text')}貼上文字</button></div>
+    <button class="heroL" data-act="examples" data-label="試試範例">沒有對話？試試範例</button></div>
+  <button class="sosCard" data-act="sos" data-label="我可能已經被騙了"><span class="si">${I('sos')}</span><span><b>我可能已經被騙了</b><span>一步一步陪你處理，報告直接寫好送銀行</span></span>${I('chev')}</button>
+  ${r ? `<button class="lastc" data-tab="chat">${tl(LV[r.level].on)}<span><b>上次檢查：${LV[r.level].n}</b><span>${r.type && r.type !== '一般對話' ? '疑似' + esc(r.type) + ' · ' : ''}點這裡回到對話</span></span>${I('chev')}</button>` : ''}
+  <div class="sec"><h3>所有功能</h3></div>
+  <div class="tiles">
+    <button class="tile" data-tab="chat"><span class="si">${I('chat')}</span><b>問 Whoscam</b><span>用聊天的方式問，像問朋友一樣</span></button>
+    <button class="tile g" data-tab="family"><span class="si">${I('people')}</span><b>家人守護圈</b><span>${S.paused ? '暫停中' : act.length ? '守護中 · ' + esc(act.map(m => m.name).join('、')) : '邀請家人，出事時通知他們'}</span></button>
+    <button class="tile a" data-tab="learn"><span class="si">${I('film')}</span><b>防詐小劇場</b><span>看完 ${done}/4 部 · ${S.pts} 點可換好禮</span></button>
+    <a class="tile r" href="tel:165"><span class="si">${I('phone')}</span><b>撥打 165</b><span>反詐騙專線，24 小時都能打</span></a>
+  </div>
+  <div class="tip"><span class="si">${I('bulb')}</span><div><small>今日防詐小知識</small><p>${TIPS[S.tip % TIPS.length]}</p><button class="link" id="nexttip">換一則 →</button></div></div>`; },
+  after:() => { $('#nexttip').onclick = () => { S.tip++; render(false); }; }};
 const FAMILY = {title:() => '家人守護圈', html:() => {
   const slots = [0, 1, 2].map(i => { const m = S.circle[i]; return m ? `<button class="slot" data-mem="${m.id}"><span class="face" style="background:${COLORS[m.c]}">${esc(m.name.slice(-1))}<span class="st ${m.status === 'pending' ? 'wait' : ''}"></span></span><b>${esc(m.name)}</b><span>${m.status === 'pending' ? '等待同意' : esc(m.rel)}</span></button>` : `<button class="slot" data-add><span class="face empty">${I('plus', 'style="width:30px;height:30px"')}</span><b>邀請</b><span>空位</span></button>`; }).join('');
   return `<h2 class="hi">出事時，讓家人知道</h2><p class="lede">最多 3 位。他們只會收到「你需要幫忙」，看不到你的對話。</p><div class="faces">${slots}</div>
