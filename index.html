@@ -163,6 +163,7 @@ button.alr{display:block;width:100%;text-align:left;border:0;color:var(--ink)}
 .cvm small{display:block;font-size:12px;color:var(--mute);font-weight:700}
 .cvm.hit{background:var(--redsoft);box-shadow:inset 0 0 0 1.5px var(--red)}
 .cvm em{display:block;font-style:normal;font-size:12.5px;color:var(--red);font-weight:800;margin-top:2px}
+.exlist{display:grid;gap:8px;margin:2px 0 8px 42px}.exg small{display:block;font-size:12.5px;font-weight:800;color:var(--mute);margin:0 0 4px 2px}.exg>div{display:flex;flex-wrap:wrap;gap:6px}.exg .chip{min-height:40px;padding:6px 12px;font-size:15px}
 .mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
 .mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
 .me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
@@ -351,18 +352,25 @@ const SCEN = [
  {id:'buyer', g:'網拍', name:'買家要我認證', text:`買家：你好，你的電鍋還在嗎？我要買，用賣貨便下單\n買家：我這邊顯示你的賣場沒有完成實名認證，沒辦法下單\n買家：你聯繫一下客服 LINE @seven-cs 開通金流服務\n客服：請開視訊分享螢幕，照指示操作網銀完成金流簽署，再提供簡訊驗證碼`},
  {id:'seller', g:'網拍', name:'私下買門票', text:`賣家：演唱會門票原價轉讓，只剩最後兩張\n賣家：不走平台比較快，加我 LINE 私下交易\n賣家：先匯訂金 3000 保留，今天沒付就給別人了`},
  {id:'job', g:'求職', name:'在家打工', text:`對方：在家打字兼職，日領2000，免經驗\n對方：公司要申請薪資補助，請提供你的提款卡和密碼，用超商交貨便寄過來\n對方：寄的時候不要跟店員說是金融卡喔`},
- {id:'fam', g:'安全', name:'家人聊天', text:`姐姐：週末回家吃飯嗎？\n我：好啊，要帶什麼？\n姐姐：帶個水果就好，媽說想吃芭樂。\n姐姐：上次聚餐的錢 600，有空再轉我就好，不急。`},
- {id:'bank', g:'安全', name:'銀行驗證碼簡訊', text:`【某某銀行】您的交易驗證碼為 482913，10分鐘內有效，請勿告知他人。如非本人操作請洽客服。`},
- {id:'post', g:'安全', name:'包裹到貨通知', text:`【中華郵政】您的包裹已送達中山郵局，請於7日內攜帶身分證件至櫃台領取。`},
+ {id:'adult', g:'交友', name:'交友約見面', text:`小婕：哥哥你好～我是兼職的，可以約喔，快速約會不用等\n小婕：先加我經紀人LINE：@date520 安排時間\n經紀人：第一次要先做會員認證，匯款3000元保證金，見面後退還\n經紀人：你的認證失敗，帳戶被凍結了，要再補繳9000元解凍金才能退回全部款項`},
+ {id:'sext', g:'交友', name:'視訊後被威脅', text:`對方：剛剛視訊我都錄下來了\n對方：你的臉書好友和家人我都找到了\n對方：今天晚上12點前轉5萬給我，不然就把影片傳給你的家人和同事`},
+ {id:'tel', g:'電話', name:'電話費語音', text:`語音：這裡是中華電信，您的電話費已逾期未繳，本公司將於今日停話，如有疑問請按9由專人服務。\n專人：您名下另一支門號欠費13762元，我幫您轉接警察局報案。`},
+ {id:'fakeurl', g:'簡訊', name:'假政府網址', text:`【財政部】您的普發現金尚未登記，請於3日內至 https://6000-gov.tw.top/reg 完成登記，逾期視同放棄。`},
+ {id:'group', g:'對話', name:'福利群組', text:`小助理：恭喜您領到免費壽司餐券！已幫您拉進福利群，每天簽到送禮\n【第 20 天】\n小助理：今天群裡老師分享飆股，跟著買月賺20%\n小助理：請下載我們的App開戶，入金10萬就能參加VIP`},
+ {id:'t165', g:'電話', name:'不要掛電話打165', text:`自稱銀行：您剛剛匯款的帳戶是警示帳戶，請不要掛電話，直接按165查證。\n自稱165警察：你涉及國際詐騙案，請把定存解約，轉到我們指定的安全帳戶。`},
+ {id:'fam', g:'一般', name:'家人提到錢', text:`姐姐：週末回家吃飯嗎？\n我：好啊，要帶什麼？\n姐姐：帶個水果就好，媽說想吃芭樂。\n姐姐：上次聚餐的錢 600，有空再轉我就好，不急。`},
+ {id:'meal', g:'一般', name:'朋友約吃飯', text:`阿傑：今晚要不要去吃火鍋？\n我：好啊幾點\n阿傑：七點，我訂好位了`},
+ {id:'bank', g:'一般', name:'銀行驗證碼簡訊', text:`【某某銀行】您的交易驗證碼為 482913，10分鐘內有效，請勿告知他人。如非本人操作請洽客服。`},
+ {id:'post', g:'一般', name:'包裹到貨通知', text:`【中華郵政】您的包裹已送達中山郵局，請於7日內攜帶身分證件至櫃台領取。`},
 ];
 const RULES = [
  {k:'pressure', name:'限時壓力', tip:'催你立刻決定，讓你沒時間查證', w:2, re:/(今天|今晚|今日|馬上|立即|立刻|名額|最後\s*\d*\s*(個|張|天|名)|限時|\d+\s*分鐘內|\d+\s*小時內|\d{1,2}[:：]\d{2}\s*前|前入金|來不及|否則|下午前|晚上前|逾期|滯納金|暫停服務|停權|停卡|失效|即將(被)?(凍結|停用|註銷))/},
  {k:'secrecy', name:'要你保密', tip:'不讓你問家人或銀行，是最危險的訊號', w:3, re:/(不要跟|不可以告訴|不能告訴|別告訴|保密|偵查不公開|不要說|就說是|不要讓.{0,6}知道|不要跟店員說)/},
- {k:'money', name:'要求轉帳', tip:'出現帳號、匯款、入金或付費', w:2, re:/(匯款|轉帳|轉我|轉給|入金|帳戶|帳號|網銀|ATM|虛擬貨幣|USDT|訂金|付款|支付|運費|繳納|監管|一筆轉|借我|(?<!(沒有|免|無|不收))手續費|保證金|公證金)/i},
+ {k:'money', name:'牽涉金錢', tip:'只要牽涉匯款、轉帳、付費或帳戶，就要先確認對方身分', w:2, re:/(匯款|轉帳|轉我|轉給|入金|帳戶|帳號|網銀|ATM|虛擬貨幣|USDT|訂金|付款|支付|付錢|給錢|匯錢|轉錢|運費|繳納|繳費|監管|一筆轉|借我|借錢|代墊|墊了|幫你付|付了|還我|還你|現金|提領|領錢|面交|戶名|(?<!(沒有|免|無|不收))手續費|保證金|公證金)/i},
  {k:'profit', name:'保證獲利', tip:'合法投資一定有風險，不會穩賺不賠', w:3, re:/(保證獲利|穩賺|不賠|保本|零風險|高獲利|月賺|日賺|跟單|帶單|內部數據|內線|飆股|賺了\s*\d+\s*%)/},
  {k:'withdraw', name:'出金要先繳錢', tip:'要領回獲利卻要先繳稅金、保證金，是假平台', w:4, re:/((出金|提領|領出來|提現).{0,12}(先繳|保證金|稅|手續費|解凍)|(解凍|保證金).{0,8}(才能|才可以).{0,4}(出金|提領|領))/},
  {k:'authority', name:'假冒公權力', tip:'檢警不會在電話裡要你交錢或交卡', w:3, re:/(檢察官|地檢署|法院|警官|刑事局|洗錢|拘提|通緝|傳票|監管(你的)?(帳戶|資產)|身分證.{0,4}(被|遭)?冒用|健保卡.{0,4}(被|遭)?冒用|轉接.{0,4}(警察|檢察))/},
- {k:'imperson', name:'假冒熟人', tip:'自稱熟人、換了新號碼，突然要錢或要驗證碼', w:3, re:/(老朋友|老同學|換.{0,3}(號碼|手機|LINE)|新(號碼|帳號)|猜猜我是誰|周轉|在忙嗎)/i},
+ {k:'imperson', name:'裝熟／假冒熟人', tip:'自稱熟人、換了新號碼，突然要錢、要你代墊或要驗證碼', w:3, re:/(老朋友|老同學|換.{0,3}(號碼|手機|LINE)|新(號碼|帳號|的LINE)|猜猜我是誰|你猜我是誰|還記得我嗎|是我啦|我是你的?(同學|朋友|姪子|外甥|學長|學姊|表哥|表姊)|手機(壞|掉|摔壞)了|周轉|在忙嗎|幫我(先)?(付|墊|買|代購))/i},
  {k:'otp', name:'索取驗證碼', tip:'驗證碼、密碼等於鑰匙，任何人要都不能給', w:4, re:/((驗證碼|認證碼|OTP|簡訊碼|密碼|帳密).{0,10}(傳給|給我|提供|回傳|告訴我|截圖|念給|寄過來)|(提供|傳|給我|寄).{0,8}(驗證碼|認證碼|密碼|帳密)|輔助認證|好友認證)/i, skip:/(請勿|切勿|不要|勿).{0,4}(告知|提供|給)/},
  {k:'card', name:'要你交出卡片', tip:'交出提款卡、存摺會被拿去詐騙，自己也會吃官司', w:4, re:/((提款卡|金融卡|存摺|印章|網銀帳號).{0,10}(寄|交|給|放|提供|拿)|(寄|交|提供|放).{0,8}(提款卡|金融卡|存摺)|收購帳戶|租借帳戶|出租帳戶)/},
  {k:'remote', name:'要你分享螢幕', tip:'分享螢幕或裝遠端 App，對方就能看到你的密碼', w:4, re:/(分享螢幕|螢幕(分享|共享)|共享螢幕|視訊.{0,6}(分享|共享)|遠端(操作|控制|協助)|AnyDesk|TeamViewer)/i},
@@ -373,17 +381,61 @@ const RULES = [
  {k:'freebie', name:'天上掉下來的好康', tip:'中獎、免費送卻要你付運費或填資料，多半是釣魚', w:2, re:/(恭喜(您|你)?.{0,4}(抽中|中獎|獲得)|抽中|中獎|免費(送|領|贈)|贈送|結緣|領取.{0,6}(獎|禮|補助|退款|現金)|補助金|普發|退款|退費)/},
  {k:'bill', name:'假催繳通知', tip:'機關和物流不會用簡訊附連結叫你繳費，自己上官方 App 查', w:2, re:/(欠費|未繳|逾期未|罰單|罰鍰|停車費|通行費|ETC|電費|水費|帳單|滯納金|地址(不全|錯誤)|包裹.{0,8}(無法|暫停|退回)|關稅)/i},
  {k:'platform', name:'要你加 LINE 或私下聯絡', tip:'陌生人叫你加 LINE、離開平台，就失去保障', w:2, re:/(加.{0,6}(LINE|賴|line|Line)|LINE\s*(ID)?\s*[：:＠@]|ID\s*[：:]|添加.{0,10}(LINE|專員|客服)|私訊|私下交易|不走平台|離開平台|下載.{0,8}(App|APP|程式)|@[a-z0-9_.-]{3,})/i},
- {k:'link', name:'陌生連結', tip:'付款或登入連結可能是釣魚網站，不要點', w:2, re:/(https?:\/\/(?![^\s]*\.gov\.tw)|www\.|點擊連結|點這個連結|bit\.ly|reurl|lihi|\.top\b|\.cc\b|\.xyz\b)/i},
+ {k:'link', name:'陌生連結', tip:'付款或登入連結可能是釣魚網站，不要點', w:2, re:/(點擊連結|點這個連結|點下方連結|點連結)/},
+ {k:'fakeurl', name:'假冒官方的網址', tip:'自稱政府、銀行或大公司，但網址不是他們的官方網址', w:5, re:/$^/},
+ {k:'shorturl', name:'短網址或怪網址', tip:'短網址看不出真正的網站；少見的網址結尾常被拿來做釣魚網站', w:2, re:/$^/},
+ {k:'adult', name:'色情應召或交友', tip:'色情應召不合法，也是詐騙熱門手法，會用「會員認證、保證金、解凍金」一直要錢', w:3, re:/(援交|外送茶|約炮|約砲|一夜情|兼職妹|茶莊|魚訊|包養|快速約會|特別服務|性服務|成人網站|裸聊|色情|定點服務|經紀人.{0,6}(安排|LINE)|陪聊)/},
+ {k:'unfreeze', name:'一直要你補錢', tip:'「會員認證、保證金、解凍金、違約金」一直要你補錢，是詐騙的無底洞', w:4, re:/(會員認證|信用(驗證|分數)|解凍金|違約金|補繳.{0,10}(才能|才可以)|帳戶.{0,4}(被)?凍結.{0,10}(補|繳)|洗碼量|激活金|提領.{0,6}(補款|補繳))/},
+ {k:'extort', name:'威脅要散布影片', tip:'對方拿影片或照片威脅你付錢，付了只會被要更多', w:6, re:/((散布|散播|傳給|寄給|發給|(?<!不)公開|外流|貼到).{0,12}(影片|照片|裸照|視訊|錄影)|(影片|照片|裸照|視訊|錄影).{0,24}(散布|散播|傳給|寄給|發給|(?<!不)公開|外流|貼到)|(影片|照片|視訊).{0,8}(錄下來|截圖)|錄下來了|不雅(影片|照片)|私密(影片|照片))/},
+ {k:'telecom', name:'假電信語音催繳', tip:'電信公司語音催繳只有錄音，不會叫你按鍵轉接專人', w:3, re:/((中華電信|台灣大哥大|遠傳|亞太電信|台灣之星|電信公司).{0,24}(欠費|未繳|逾期|停話|停機|帳單)|(電話費|話費|門號).{0,10}(欠費|逾期|未繳|停話|停機)|按\s*9|轉接(專人|客服)|語音(通知|催繳))/},
+ {k:'fake165', name:'叫你不要掛電話直接打 165', tip:'真正的 165 不會被轉接；要你不掛電話直接按 165，一定是詐騙', w:5, re:/((不要|別)掛(斷)?電話.{0,12}165|165.{0,6}(轉接|分機)|直接(按|撥)\s*165|轉接.{0,4}165|安全帳戶)/},
+ {k:'group', name:'拉你進投資或福利群組', tip:'先送贈品、拉進群組每天簽到，再帶你投資，是假投資常見開頭', w:2, re:/((拉|邀請|加入).{0,6}(群組|社群|福利群|投資群|VIP群)|福利群|每天簽到|簽到送|飆股|老師(分享|帶)|VIP)/i},
+ {k:'foreign', name:'境外或偽造來電', tip:'顯示 +886 或 + 開頭的來電多半是境外偽造，掛掉自己回撥官方', w:2, re:/(\+886|\+\d{1,3}\s?\d|00\d{3}\d+|境外來電|國際電話)/},
  {k:'romance', name:'網友談感情又談錢', tip:'沒見過面的網友噓寒問暖後談投資，是假交友詐騙', w:1, re:/(寶貝|親愛的|老婆|老公|想你|愛你)/},
 ];
 const CALM = /(不急|有空再)/;
+const OFFICIAL = ['line.me', '7-11.com.tw', 'family.com.tw', 'shopee.tw', 'momoshop.com.tw', 'pchome.com.tw', 'ruten.com.tw', 'fetc.net.tw', 'cht.com.tw', 'taiwanmobile.com', 'fetnet.net', 'esunbank.com', 'cathaybk.com.tw', 'ctbcbank.com', 'fubon.com', 'taishinbank.com.tw', 'sinopac.com', 'megabank.com.tw', 'landbank.com.tw', 'firstbank.com.tw', 'hncb.com.tw', 'tcb-bank.com.tw', 'bot.com.tw', 'google.com', 'youtube.com', 'apple.com', 'facebook.com', 'instagram.com', '104.com.tw', '1111.com.tw'];
+const SHORT = /^(bit\.ly|tinyurl\.com|t\.co|reurl\.cc|lihi\d?\.(cc|com|me)|ppt\.cc|myppt\.cc|pse\.is|s\.id|is\.gd|cutt\.ly|rb\.gy|shorturl\.at|risu\.io|x\.gd|ow\.ly|goo\.gl|tny\.im|0rz\.tw)$/i;
+const BADTLD = /\.(top|xyz|cc|vip|icu|shop|club|buzz|live|online|site|info|cn|sbs|cfd|bond|work|click|link|monster|rest|mom|win|loan|bid|fun|life|store|asia|pw|tk|ml|ga|cf|gq)$/i;
+const BRANDHOST = /(gov|g0v|mvdis|fetc|etag|7-?11|seven|famil|shopee|momo|1ine|line|post|chunghwa|cht|esun|cathay|ctbc|fubon|taishin|sinopac|mega|landbank|bank|apple|icloud|google|netflix|6000|tax|nhi|165|npa)/i;
+const BRANDTEXT = /(政府|財政部|監理|公路局|交通部|遠通|ETC|中華郵政|郵局|7-11|統一超商|全家|蝦皮|momo|LINE官方|銀行|健保|國稅局|台電|自來水|普發|165|警政署|中華電信)/i;
+function regDomain(h){ const p = h.split('.'); if (p.length >= 3 && /^(com|net|org|gov|edu|idv|co)$/.test(p[p.length - 2]) && p[p.length - 1].length === 2) return p.slice(-3).join('.'); return p.slice(-2).join('.'); }
+function inspectLinks(raw){
+  const urls = raw.match(/(https?:\/\/[^\s，。！？、）)」』]+|(?<![@\w.])(?:www\.)?[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:com|net|org|tw|cc|top|xyz|vip|icu|shop|club|buzz|live|online|site|info|cn|me|ly|io|gd|at|co|sbs|cfd|bond|work|click|link|win|fun|store|life)(?:\/[^\s，。！？]*)?)/gi) || [];
+  const out = [];
+  for (const u0 of [...new Set(urls)]){
+    const u = /^https?:/i.test(u0) ? u0 : 'http://' + u0; let host = '';
+    try { host = new URL(u).hostname.toLowerCase(); } catch (e) { continue; }
+    const reasons = []; const gov = host === 'gov.tw' || host.endsWith('.gov.tw'); const reg = regDomain(host); const official = gov || OFFICIAL.includes(reg);
+    let fake = false, odd = false;
+    if (!official){
+      if (/g[o0]v/.test(host)){ reasons.push('網址有「gov」卻不是 .gov.tw 結尾，不是政府網站'); fake = true; }
+      else if (BRANDHOST.test(host.replace(reg, '') + ' ' + reg)){ reasons.push('網址裡放了知名公司或機關的名字，但不是他們的官方網址'); fake = true; }
+      else if (BRANDTEXT.test(raw)){ reasons.push('訊息自稱官方單位，但網址不是官方網址'); fake = true; }
+      if (SHORT.test(host)){ reasons.push('短網址看不出真正要去哪個網站'); odd = true; }
+      if (BADTLD.test(host)){ reasons.push(`網址結尾「.${host.split('.').pop()}」很少被正派單位使用`); odd = true; }
+      if (/^\d+\.\d+\.\d+\.\d+$/.test(host)){ reasons.push('網址是一串數字，不是正常的網站名稱'); odd = true; }
+      if (/xn--/.test(host)){ reasons.push('網址用了偽裝的特殊字元'); fake = true; }
+      if ((host.match(/-/g) || []).length >= 2){ reasons.push('網址有很多「-」，常見於仿冒網站'); odd = true; }
+      if (!reasons.length) reasons.push('陌生網址，無法確認是誰的網站');
+    }
+    out.push({url:u0, host, official, fake, odd, reasons});
+  }
+  return out;
+}
 const TYPES = [
+ ['extort', '性勒索（拿影片威脅）', '對方拿視訊或照片威脅你付錢。付錢不會讓影片消失，只會被要更多。', ['不要付錢，也不要再傳任何影像', '保留對話、帳號和匯款資訊，打 110 報案', '可向衛福部「性影像處理中心」申請協助下架', '跟一個你信任的人說，你不需要一個人面對']],
+ ['fake165', '假冒 165／安全帳戶', '真正的 165 不會被轉接，也沒有「安全帳戶」。要你不掛電話直接按 165，一定是詐騙。', ['馬上掛斷電話', '用另一支電話自己撥 165 或 110', '不要解定存、不要轉帳到任何「安全帳戶」']],
+ ['telecom', '假電信語音催繳', '電信公司的語音催繳只是一段錄音，不會叫你按 9 轉接專人，更不會幫你轉接警察。', ['直接掛斷，不要按任何鍵', '自己撥電信客服（中華電信 123）查詢', '有疑問打 165']],
  ['authority', '假檢警', '真正的檢警不會打電話要你交錢、交卡或監管帳戶，也不會要你對家人保密。', ['掛掉電話，自己打 165 或 110 查證', '戶政、健保、電信不會幫你「轉接」警察或檢察官', '不要交出提款卡、存摺或密碼']],
  ['withdraw', '假投資平台', '賺了錢要領出來卻要先繳保證金或稅，這是假平台不讓你出金的手法。', ['不要再匯任何錢進去', '到 165 打詐儀錶板查這個平台', '保留對話和匯款紀錄，打 165 報案']],
  ['profit', '假投資', '保證獲利、穩賺不賠加上限時入金，是假投資最常見的組合。', ['合法投資一定有風險，不會保證獲利', '到金管會網站查是不是合法業者', '不要匯錢到私人帳戶']],
  ['cs', '假客服（解除分期）', 'ATM 和網銀沒有「解除分期」或「金流簽署」的功能，照做錢就會被轉走。', ['馬上掛斷，不要操作 ATM 或網銀', '自己查官方客服電話回撥確認', '不要提供任何驗證碼']],
  ['remote', '分享螢幕盜帳戶', '對方要你分享螢幕或安裝遠端 App，就能看到你的帳號、密碼和驗證碼。', ['立刻結束視訊、不要分享畫面', '如果已經操作網銀，馬上打給銀行停用', '打 165 諮詢']],
  ['card', '騙取帳戶（人頭帳戶）', '交出提款卡、存摺或密碼，帳戶會被拿去詐騙洗錢，你也可能被起訴。', ['不要寄出或交出任何卡片、存摺', '已經寄出的話，馬上打給銀行掛失', '打 165 報案']],
+ ['adult', '色情應召詐騙', '色情應召不合法，也是詐騙熱門手法：先收保證金或會員費，再用各種名目一直要錢，甚至威脅你。', ['不要付任何保證金或點數', '封鎖對方，不要提供住址或工作資訊', '被威脅的話保留證據，打 165 或 110']],
+ ['unfreeze', '一直要你補錢（解凍金）', '先收一筆，再用「認證失敗、帳戶凍結、要補解凍金」一直要錢，付多少都拿不回來。', ['不要再付任何一筆錢', '保留對話和匯款紀錄', '打 165 報案，越早越有機會攔下']],
+ ['fakeurl', '假冒官方的釣魚網站', '訊息自稱官方，但網址不是官方網址，點進去會騙你輸入個資、信用卡或帳密。', ['不要點連結、不要輸入任何資料', '政府網站一定是 .gov.tw 結尾，gov 前面不會有別的字', '自己打開官方 App 或官網查詢']],
  ['loan', '假貸款', '銀行不會用簡訊叫你加 LINE 找「信貸專員」，也不會在撥款前先收手續費或保證金。', ['需要借錢請直接到銀行臨櫃或官網申請', '不要加簡訊裡的 LINE，可到 165 查 LINE ID', '不要先付任何費用、不要給存摺或提款卡']],
  ['otp', '盜帳號（騙驗證碼）', '驗證碼等於帳號的鑰匙，給出去帳號就會被盜，再拿去騙你的朋友。', ['不要把驗證碼給任何人，包括朋友', '打電話給本人確認', 'LINE 沒有「好友輔助認證」這種功能']],
  ['imperson', '假冒熟人借錢', '自稱老朋友或換了新號碼，突然急著借錢，很可能是冒充的。', ['打他原本的電話確認是不是本人', '不要先轉帳', '問一個只有本人知道的問題']],
@@ -391,6 +443,9 @@ const TYPES = [
  ['points', '點數詐騙', '正當商家和機關不會叫你買遊戲點數付款，點數一給出去就追不回來。', ['不要購買或拍照傳出點數序號', '打 165 諮詢']],
  ['bill', '釣魚簡訊（假催繳）', '機關、ETC 和物流不會用簡訊附連結叫你線上繳費，連結多半是要騙信用卡。', ['不要點連結、不要輸入信用卡', '自己打開官方 App 或官網查詢', '已經輸入卡號的話，馬上打給銀行停卡']],
  ['freebie', '假好康（釣魚）', '天上掉下來的獎品卻要你付運費或填資料，多半是要騙個資或信用卡。', ['不要點連結、不要付運費', '到官方網站或 App 確認有沒有這個活動']],
+ ['group', '假投資群組', '先送贈品、拉進福利群每天簽到，再由「老師」報明牌、叫你下載 App 入金，是假投資最常見的開頭。', ['不要下載對方給的 App、不要入金', '退出群組，到 165 查 LINE ID', '投資只找合法券商，查金管會名單']],
+ ['shorturl', '可疑的網址', '短網址或少見的網址結尾，常被用來藏釣魚網站。', ['不要點，先問傳給你的人是什麼', '把網址貼到 165 打詐儀錶板查詢']],
+ ['foreign', '可疑來電', '顯示 + 號開頭的來電多半是境外偽造，常假冒機關或銀行。', ['掛斷後自己查官方電話回撥', '有疑問打 165']],
  ['platform', '私下交易詐騙', '陌生人叫你加 LINE 或離開平台私下交易，付了錢常常就找不到人，也沒有平台保障。', ['留在原本的平台交易', '不要先匯訂金給私人帳戶']],
  ['link', '釣魚連結', '陌生連結可能是仿冒網站，會騙你輸入帳號密碼或信用卡。', ['不要點連結', '自己打開官方網站確認']],
 ];
@@ -519,6 +574,8 @@ function analyse(raw){
     hits.forEach(k => { found[k] = (found[k] || 0) + 1; if (!first[k]) first[k] = text; });
     out.push({who, text, me:mine, hits, day});
   });
+  const links = inspectLinks(raw);
+  links.filter(x => !x.official).forEach(x => { found.link = (found.link || 0) + 1; if (!first.link) first.link = x.url; if (x.fake){ found.fakeurl = 1; first.fakeurl = first.fakeurl || x.url; } if (x.odd){ found.shorturl = 1; first.shorturl = first.shorturl || x.url; } });
   const f = k => !!found[k];
   let score = RULES.reduce((s, r) => s + (found[r.k] ? r.w : 0), 0);
   if (f('money') && f('pressure')) score += 2; if (f('money') && f('secrecy')) score += 2;
@@ -527,19 +584,27 @@ function analyse(raw){
   if (f('romance') && (f('profit') || f('money') || f('withdraw'))) score += 2;
   if (f('job') && (f('card') || f('money') || f('platform'))) score += 2;
   if (f('money') && f('platform')) score += 2;
-  const strong = ['platform', 'secrecy', 'profit', 'withdraw', 'authority', 'imperson', 'otp', 'card', 'remote', 'points', 'loan', 'cs', 'link', 'bill', 'freebie', 'job'];
-  if (f('money') && !strong.some(f)) score = Math.min(score, 2);
+  if (f('adult') && (f('money') || f('platform') || f('unfreeze') || f('points'))) score += 3;
+  if (f('telecom') && (f('pressure') || f('authority') || f('money'))) score += 2;
+  if (f('group') && (f('profit') || f('money') || f('platform'))) score += 2;
+  if (f('foreign') && (f('authority') || f('money') || f('telecom'))) score += 2;
+  const big = (raw.match(/\d+(\.\d+)?\s*萬|[一二三四五六七八九十兩百]+萬|\d{5,}\s*元|\d{2,3},\d{3}/) || [])[0];
+  if (big && f('money')) score += 1;
+  const strong = ['adult', 'unfreeze', 'extort', 'telecom', 'fake165', 'group', 'fakeurl', 'shorturl', 'foreign', 'platform', 'secrecy', 'profit', 'withdraw', 'authority', 'imperson', 'otp', 'card', 'remote', 'points', 'loan', 'cs', 'link', 'bill', 'freebie', 'job'];
   if (f('bill') && !f('link') && !f('money') && !f('pressure')) score = Math.min(score, 2);
-  if (['otp', 'card', 'remote', 'withdraw', 'points'].some(f)) score = Math.max(score, 6);
+  if (['otp', 'card', 'remote', 'withdraw', 'points', 'extort', 'fake165', 'unfreeze', 'fakeurl'].some(f)) score = Math.max(score, 6);
+  if (f('money') || f('link')) score = Math.max(score, 3); // 只要牽涉金錢或陌生連結，至少要提高警覺
   if (f('authority') && (f('money') || f('secrecy') || f('card'))) score = Math.max(score, 6);
   const level = score >= 6 ? 'high' : score >= 3 ? 'mid' : 'low';
   const names = RULES.filter(r => found[r.k]).map(r => r.name);
   let T = TYPES.find(t => f(t[0]) && (t[0] !== 'platform' && t[0] !== 'link' || level !== 'low'));
   if (T && T[0] === 'cs' && /(買家|賣場|下單|賣貨便|好賣)/.test(raw)) T = ['cs', '假買家（金流認證）', '賣貨便、蝦皮等平台沒有「實名認證」「金流簽署」要你操作網銀的流程，這是假買家詐騙。', ['不要點對方給的客服連結或加客服 LINE', '自己打開平台官方 App 確認訂單', '不要分享螢幕、不要給驗證碼']];
+  if (T && T[0] === 'profit' && f('group')) T = TYPES.find(t => t[0] === 'group');
   if (T && (T[0] === 'profit' || T[0] === 'withdraw') && f('romance')) T = ['profit', '假交友投資', '沒見過面的網友先談感情、再帶你投資，是「假交友投資」詐騙，損失往往最大。', ['不要再匯任何錢', '對方不肯視訊或見面就是警訊', '到 165 打詐儀錶板查這個平台']];
+  if (!T && f('money')) T = ['money', '需要先確認的金錢往來', '這段內容牽涉到錢。就算是認識的人，也要先用原本的電話確認是本人，再決定要不要給。', ['打對方原本的電話確認是本人', '不要因為對方催就先轉', '帳戶戶名和本人不同時要特別小心']];
   const type = level === 'low' ? '一般對話' : T ? T[1] : '可疑對話';
   const why = level === 'low' ? (names.length ? '有提到錢，但沒有催促、保密或其他詐騙手法，像一般對話。' : '沒有發現常見的詐騙訊號。') : T ? (level === 'mid' ? '不一定是詐騙，但有可疑之處：' : '') + T[2] : '有多個可疑的地方，先停下來用官方管道查證。';
-  return {level, found, first, names, why, type, check:level === 'low' ? [] : T ? T[3] : ['先不要付款', '打 165 諮詢'], lines:out, ai:false, score};
+  return {level, found, first, names, why, type, links, big:big || '', check:level === 'low' ? [] : T ? T[3] : ['先不要付款', '打 165 諮詢'], lines:out, ai:false, score};
 }
 function facts(r){
   const all = r.lines.filter(l => l.who !== undefined), them = all.filter(l => l.who !== '我'), base = them.length ? them : all, txt = base.map(l => l.text).join('\n'), F = [];
@@ -551,7 +616,7 @@ function facts(r){
   const amts = [...new Set((txt.match(/\d[\d,]*(?:\.\d+)?\s*(?:萬|千|元|塊)|[一二三四五六七八九十兩百千]+萬|NT\$?\s?\d[\d,]*/g) || []).map(s => s.replace(/\s/g, '')))]; if (amts.length) F.push(['金額', amts.slice(0, 3).join('、')]);
   const dl = txt.match(/(\d+\s*分鐘內|\d{1,2}\s*點前|今[天晚][^，。！？\n]{0,5}前|[上下]午前|晚上前|馬上|立刻|現在就)/) || txt.match(/(今天|今晚)/); if (dl) F.push(['期限', dl[0]]);
   const ac = (r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/) || [])[0]; if (ac) F.push(['帳號', ac]);
-  if (r.found.link) F.push(['連結', '有陌生連結，不要點']);
+  const sus = (r.links || []).filter(x => !x.official); if (sus.length) F.push(['網址', sus.map(x => x.host).slice(0, 2).join('、') + (r.found.fakeurl ? '（假冒官方）' : '（可疑，不要點）')]);
   return F;
 }
 const SRC = {shot:'截圖辨識，本人已確認', 'shot-ai':'截圖由 AI 辨識', paste:'本人貼上的文字', example:'範例對話'};
@@ -583,12 +648,12 @@ level：high＝多個訊號同時出現或對方已在要錢；mid＝有可疑�
 ${numbered}`, {modelTier:'default'});
   const level = ['high','mid','low'].includes(out.level) ? out.level : base.level; const found = {}, first = {}; msgs.forEach(m => m.hits = []);
   (Array.isArray(out.signals) ? out.signals : []).forEach(s => { if (!s || !CODES[s.code]) return; found[s.code] = (found[s.code] || 0) + 1; const m = msgs[(+s.line || 0) - 1]; if (m && !m.hits.includes(s.code)) m.hits.push(s.code); if (!first[s.code]) first[s.code] = String(s.quote || (m ? m.text : '')).slice(0, 40); });
-  return {level, found, first, names:RULES.filter(r => found[r.k]).map(r => r.name), why:String(out.why || base.why).slice(0, 80), type:String(out.type || base.type).slice(0, 20), lines:base.lines, check:base.check && base.check.length ? base.check : ['先不要付款', '用官方管道或 165 查證'], ai:true};
+  return {level, found, first, names:RULES.filter(r => found[r.k]).map(r => r.name), why:String(out.why || base.why).slice(0, 80), type:String(out.type || base.type).slice(0, 20), lines:base.lines, links:base.links, big:base.big, check:base.check && base.check.length ? base.check : ['先不要付款', '用官方管道或 165 查證'], ai:true};
 }
 
 // ---------- chat engine ----------
 function bot(m){ S.msgs.push(Object.assign({from:'bot'}, m)); }
-function me(m){ S.msgs.forEach(x => { if (x.kind === 'chips' || x.kind === 'start') x.used = true; }); S.msgs.push(Object.assign({from:'me'}, m)); }
+function me(m){ S.msgs.forEach(x => { if (x.kind === 'chips' || x.kind === 'start' || x.kind === 'exlist') x.used = true; }); S.msgs.push(Object.assign({from:'me'}, m)); }
 function typing(){ S.msgs.push({from:'bot', kind:'typing'}); render(); }
 function untype(){ S.msgs = S.msgs.filter(m => m.kind !== 'typing'); }
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -687,15 +752,15 @@ function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('�
 
 async function act(a){
   if (S.tab !== 'chat' && ['paste', 'sos', 'examples', 'paid'].includes(a)){ S.tab = 'chat'; S.page = null; }
-  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start') && a !== 'shot' && a !== 'review') last.used = true;
+  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start' || last.kind === 'exlist') && a !== 'shot' && a !== 'review') last.used = true;
   const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
   if (a === 'reset' || a === 'newchat'){ closeDrawer(); newChat(); S.tab = 'chat'; S.page = null; render(); return; }
   if (a === 'history'){ S.tab = 'chat'; S.page = null; render(); openDrawer(); return; }
   if (a === 'review'){ if (S.review) reviewSheet(); else toast('這段已經確認過了'); return; }
   if (a === 'shot'){ $('#shotin').click(); render(); return; }
   if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
-  if (a === 'examples'){ bot({kind:'text', text:['選一段範例試試看。這些都是 165 和刑事局整理過的常見手法，最後三個是正常訊息：']}); chips(SCEN.map(s => ({t:s.name, a:'ex:' + s.id, dim:s.g === '安全'}))); render(true); return; }
-  if (a.startsWith('ex:')){ const s = SCEN.find(x => x.id === a.slice(3)); S.msgs.pop(); S.shots = []; await analyseText(s.text, s.id, '範例：' + s.name); if (s.g !== '安全') S._ex = true; return; }
+  if (a === 'examples'){ bot({kind:'text', text:['選一段範例試試看。這些都是 165 和刑事局公布過的常見手法；「一般」是正常訊息，可以看看哪些會被提醒。']}); S.msgs.push({from:'bot', kind:'exlist'}); render(true); return; }
+  if (a.startsWith('ex:')){ const s = SCEN.find(x => x.id === a.slice(3)); S.msgs.pop(); S.shots = []; await analyseText(s.text, s.id, '範例：' + s.name); if (s.g !== '一般') S._ex = true; return; }
   if (a === 'why'){ const r = S.result; bot({kind:'why', r}); chips([{t:'看整段對話標示', a:'full'}, ...(r.level === 'low' ? [] : [{t:'我已經匯款了', a:'paid', red:true}])]); render(true); return; }
   if (a === 'full'){ fullSheet(); return; }
   if (a === 'call'){ tick1(); bot({kind:'call'}); chips([{t:'我已經匯款了', a:'paid', red:true}, {t:'再檢查另一段', a:'shot', ic:'img'}]); render(true); return; }
@@ -747,6 +812,7 @@ function msgHTML(m, i){
     <button class="sbtn" data-act="paste" data-label="我要貼上文字"><span class="si">${I('text')}</span><span><b>貼上或打字</b><span>複製可疑訊息，或說說發生什麼事</span></span></button>
     <button class="sbtn red" data-act="sos" data-label="我可能已經被騙了"><span class="si">${I('sos')}</span><span><b>我可能已經被騙了</b><span>一步一步陪你處理，報告直接寫好</span></span></button>
     <button class="slink" data-act="examples" data-label="試試範例">沒有對話？試試範例 →</button></div>`;
+  if (m.kind === 'exlist') return m.used ? '' : `<div class="exlist ${m.seen ? '' : 'in'}">${['簡訊', '電話', '對話', '交友', '網拍', '求職', '一般'].map(g => `<div class="exg"><small>${g}</small><div>${SCEN.filter(s => s.g === g).map(s => `<button class="chip ${g === '一般' ? 'dim' : ''}" data-act="ex:${s.id}" data-label="${esc(s.name)}">${esc(s.name)}</button>`).join('')}</div></div>`).join('')}</div>`;
   if (m.kind === 'chips') return m.used ? '' : `<div class="chips ${m.seen ? '' : 'in'}">${m.chips.map(c => `<button class="chip ${c.main ? 'main' : ''} ${c.red ? 'red' : ''} ${c.dim ? 'dim' : ''}" data-act="${c.a}" data-label="${esc(c.t)}">${c.ic ? I(c.ic) : ''}${esc(c.t)}</button>`).join('')}</div>`;
   const side = m.from === 'me' ? 'me' : ''; const av = m.from === 'bot' ? '<div class="av">W</div>' : '';
   let body = '';
@@ -760,7 +826,7 @@ function msgHTML(m, i){
       ${r.names.length ? `<div class="tags">${r.names.map(n => `<span class="tag">${esc(n)}</span>`).join('')}</div>` : ''}<div style="margin-top:8px"><span class="badge ${r.ai ? '' : 'm'}">${r.ai ? 'Claude AI 分析' : !SAMPLE ? '防詐規則判斷' : r.aiFail ? '規則版（AI 暫時無法使用）' : '規則版（範例）'}</span></div></div>
       ${r.level === 'low' ? '' : `<div class="btns"><button class="btn red" data-act="call" data-label="打電話查證">${I('phone')}先別付款，打電話查證</button></div>`}</div>`; }
   else if (m.kind === 'why'){ const r = m.r, hits = RULES.filter(x => r.found[x.k]);
-    body = `<div class="bub">${hits.length ? `<p><b>我看到 ${hits.length} 個警訊：</b></p>${hits.map((x, j) => `<p>${j + 1}. <b>${x.name}</b>：${esc(x.tip)}${r.first[x.k] ? `<br><span style="color:var(--mute);font-size:14.5px">「${esc(r.first[x.k].slice(0, 30))}」</span>` : ''}</p>`).join('')}` : '<p>沒有看到常見的詐騙訊號，不過有疑問時，還是可以打電話給本人或官方查證。</p>'}${r.check && r.check.length ? `<p style="margin-top:10px"><b>建議你這樣做：</b></p>${r.check.map(c => `<p>✓ ${esc(c)}</p>`).join('')}` : ''}</div>`; }
+    body = `<div class="bub">${hits.length ? `<p><b>我看到 ${hits.length} 個警訊：</b></p>${hits.map((x, j) => `<p>${j + 1}. <b>${x.name}</b>：${esc(x.tip)}${r.first[x.k] ? `<br><span style="color:var(--mute);font-size:14.5px">「${esc(r.first[x.k].slice(0, 30))}」</span>` : ''}</p>`).join('')}` : '<p>沒有看到常見的詐騙訊號，不過有疑問時，還是可以打電話給本人或官方查證。</p>'}${r.links && r.links.some(x => !x.official) ? `<p style="margin-top:10px"><b>網址檢查：</b></p>${r.links.filter(x => !x.official).map(x => `<p><span style="font-family:ui-monospace,monospace;font-size:13.5px;word-break:break-all;color:var(--red)">${esc(x.host)}</span><br>${x.reasons.map(t => '・' + esc(t)).join('<br>')}</p>`).join('')}` : ''}${r.check && r.check.length ? `<p style="margin-top:10px"><b>建議你這樣做：</b></p>${r.check.map(c => `<p>✓ ${esc(c)}</p>`).join('')}` : ''}</div>`; }
   else if (m.kind === 'call') body = `<div class="bub"><p><b>用你自己查到的電話查證，不要用對方給的。</b></p><div class="numcard"><div><span>你的往來銀行</span><b>銀行官網的客服</b></div><div><span>說是家人朋友</span><b>打他原本的號碼</b></div></div><a class="btn red" href="tel:165">${I('phone')}撥打 165 反詐騙專線</a></div>`;
   else if (m.kind === 'report'){ const R = m.rec || S.rec, att = attachList();
     body = `<div class="rep"><h4>${R.who === 'family' ? '關懷通報' : '疑似詐騙通報'}<span class="badge ${R.by === 'ai' ? '' : 'm'}">${R.by === 'ai' ? 'Claude 撰寫' : R.by === 'user' ? '已修改' : '自動帶入'}</span></h4><pre>${esc(R.report)}</pre>
@@ -915,7 +981,7 @@ function newCode(){ const a = new Uint8Array(8); crypto.getRandomValues(a); retu
 const fmtCode = c => c.slice(0, 4) + '-' + c.slice(4);
 function pubInvite(m){ if (!m.code) return; m.invAt = Date.now(); pub(m.topic, JSON.stringify({n:S.me || '家人', r:m.rel}), {tags:['whoscam-invite']}).catch(() => { m.invAt = 0; }); }
 function parseCase(msg){ const k = msg.indexOf('\n— 對話 —'); const top = k < 0 ? msg : msg.slice(0, k), conv = k < 0 ? '' : msg.slice(k + 7).replace(/^\n/, '');
-  const L = top.split('\n'), o = {head:L[0], conv}; L.slice(1).forEach(l => { const m = l.match(/^(風險|類型|警訊|說明|已匯出|對方|要求|金額|期限|帳號|連結|來源)：(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
+  const L = top.split('\n'), o = {head:L[0], conv}; L.slice(1).forEach(l => { const m = l.match(/^(風險|類型|警訊|說明|已匯出|對方|要求|金額|期限|帳號|連結|網址|來源)：(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
 function openCase(topic, id){ const g = S.guarding.find(x => x.topic === topic); const a = g && g.alerts.find(x => x.id === id); if (!a) return;
   a.seen = true; S.caseRef = {topic, id}; S.tab = 'family'; S.page = 'case'; closeSheet(); render(); }
 const CASE = {title:() => '家人的狀況', html:() => {
@@ -925,7 +991,7 @@ const CASE = {title:() => '家人的狀況', html:() => {
   const an = c.conv ? analyse(c.conv) : null, tags = c['警訊'] ? c['警訊'].split('、') : [];
   return `<div class="res ${lvl}" style="width:100%;margin:10px 0 4px"><div class="top">${tl(LV[lvl].on)}<div><h3>${esc(g.name)}${a.test ? '傳了測試通知' : c['風險'] ? '：' + esc(c['風險']) : '需要你'}</h3><div class="lede" style="margin:2px 0 0;font-size:13.5px">${when(a.time)}</div></div></div>
     <div class="body"><p style="margin:0 0 6px"><b>${esc(c.head)}</b></p>${c['已匯出'] ? `<p style="margin:0 0 6px;color:var(--red);font-weight:700">已匯出：${esc(c['已匯出'])}</p>` : ''}${c['說明'] ? esc(c['說明']) : ''}${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}</div></div>
-  ${['對方', '要求', '金額', '期限', '帳號', '連結'].some(k => c[k]) ? `<div class="sec"><h3>重點整理</h3></div><div class="card facts big">${[['對方', '對方'], ['要求', '對方要他'], ['金額', '金額'], ['期限', '期限'], ['帳號', '對方帳號'], ['連結', '連結']].filter(([k]) => c[k]).map(([k, lb]) => `<div><span>${lb}</span><b>${esc(c[k])}</b></div>`).join('')}</div>` : ''}
+  ${['對方', '要求', '金額', '期限', '帳號', '連結', '網址'].some(k => c[k]) ? `<div class="sec"><h3>重點整理</h3></div><div class="card facts big">${[['對方', '對方'], ['要求', '對方要他'], ['金額', '金額'], ['期限', '期限'], ['帳號', '對方帳號'], ['連結', '連結'], ['網址', '可疑網址']].filter(([k]) => c[k]).map(([k, lb]) => `<div><span>${lb}</span><b>${esc(c[k])}</b></div>`).join('')}</div>` : ''}
   ${a.test ? '' : `<div class="sec"><h3>建議你這樣做</h3></div><div class="card"><ol class="todo"><li>用你平常的號碼打給${esc(g.name)}，不要用訊息裡的電話</li><li>提醒他先不要付款、不要給驗證碼或帳密</li><li>${c['已匯出'] ? '陪他打給銀行和 165，越快越有機會攔下來' : '不確定的話，一起打 165 問'}</li></ol></div>
   <button class="btn" id="ack" ${a.acked ? 'disabled' : ''}>${I('check')}${a.acked ? '已回覆「我看到了」' : '回覆：我看到了，馬上聯絡你'}</button>
   <a class="btn red" href="tel:165">${I('phone')}撥打 165 反詐騙專線</a>`}
