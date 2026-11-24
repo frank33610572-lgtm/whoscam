@@ -1,0 +1,15 @@
+{
+  "name": "Whoscam 防詐小幫手",
+  "short_name": "Whoscam",
+  "description": "把可疑的截圖或對話傳給 Whoscam，30 秒告訴你風險和下一步。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whoscam 防詐小幫手</title>
+<meta name="description" content="把可疑的截圖或對話傳給 Whoscam，30 秒告訴你風險和下一步。">
+<meta name="theme-color" content="#4f46e5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Whoscam">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Inter:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday app for all ages: calm, warm, one thing at a time
+   IDEA a chat with a friend who knows scams, like the LINE people already use
+   PICTURE the phone open mid-conversation: a screenshot sent, a red traffic-light verdict, one big next step
+   COLOUR soft chat ground, indigo brand, red / amber / green only for risk
+   TYPE Noto Sans TC, Inter for numbers; 17px body, 44px targets
+   LAYOUT laptop: phone left, tester sheet right; phone width: the app is the whole screen */
+:root{color-scheme:light dark;--page:light-dark(#eceafd,#0d0e1a);--bg:light-dark(#ffffff,#13141f);--chat:light-dark(#f1f2f8,#0f1019);--sub:light-dark(#f4f4fa,#1c1d2b);--ink:light-dark(#151726,#eef0f8);--mute:light-dark(#646a80,#9aa1b8);--line:light-dark(#e3e4ef,#2b2d3f);--brand:light-dark(#4f46e5,#8f88ff);--brandink:light-dark(#3730a3,#c4c0ff);--brandsoft:light-dark(#eeedff,#22214a);--fill:light-dark(#4f46e5,#5b52f0);--red:light-dark(#dc2f2f,#ff6a62);--fillred:light-dark(#dc2f2f,#c92a2a);--redsoft:light-dark(#fdeded,#3b1b1d);--amber:light-dark(#b86e00,#ffb547);--ambersoft:light-dark(#fff4dd,#3a2c12);--green:light-dark(#178a4c,#4fd18a);--greensoft:light-dark(#e6f6ed,#132f22);--card:light-dark(#ffffff,#1a1b29)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--page);color:var(--ink);font:17px/1.55 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+svg.i{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1160px;margin:0 auto;padding:28px max(16px,4vw) 48px;display:grid;grid-template-columns:minmax(0,410px) minmax(0,1fr);gap:48px;align-items:start}
+.phone{background:#0a0b12;border-radius:46px;padding:11px;box-shadow:0 40px 80px -40px #1e1b4b99;position:sticky;top:20px}
+.screen{background:var(--bg);border-radius:36px;height:min(840px,calc(100svh - 60px));min-height:640px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.status{display:flex;justify-content:space-between;padding:12px 26px 2px;font:600 14px Inter,sans-serif}
+.head{display:flex;align-items:center;gap:10px;padding:6px 14px 10px;border-bottom:1px solid var(--line)}
+.logo{width:40px;height:40px;border-radius:13px;background:var(--fill);color:#fff;display:grid;place-items:center;font:800 18px Inter,sans-serif;flex:none}
+.head .t{flex:1}
+.head b{display:block;font-size:17px;line-height:1.2}
+.head span{font-size:13px;color:var(--green);display:flex;align-items:center;gap:5px}
+.head span i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.head span.off{color:var(--amber)}
+.sosbtn{border:0;background:var(--fillred);color:#fff;border-radius:99px;padding:8px 14px;font-weight:700;font-size:15px;display:flex;gap:6px;align-items:center;min-height:42px}
+.iconbtn{border:0;background:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center}
+.view{flex:1;overflow-y:auto;scroll-behavior:smooth}
+.chatv{background:var(--chat);padding:14px 12px 10px}
+.pagev{padding:6px 18px 24px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);background:var(--bg);padding:6px 4px 10px}
+.tabs button{border:0;background:none;color:var(--mute);font-size:13px;display:grid;justify-items:center;gap:2px;min-height:52px}
+.tabs button[aria-current=page]{color:var(--brand);font-weight:700}
+.tabs svg{width:24px;height:24px}
+.row{display:flex;gap:8px;margin:10px 0;align-items:flex-end}
+.row.me{justify-content:flex-end}
+.av{width:34px;height:34px;border-radius:11px;background:var(--fill);color:#fff;display:grid;place-items:center;font:800 14px Inter,sans-serif;flex:none}
+.bub{max-width:82%;background:var(--card);border-radius:6px 20px 20px 20px;padding:10px 14px;box-shadow:0 1px 2px #0000000d;font-size:16.5px}
+.me .bub{background:var(--fill);color:#fff;border-radius:20px 6px 20px 20px}
+.bub p{margin:0}
+.bub p+p{margin-top:6px}
+.bub.img{padding:4px;background:none;box-shadow:none}
+.bub.img img{max-width:160px;max-height:240px;border-radius:16px;display:block}
+.bub .imgs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.typing{display:flex;gap:5px;padding:4px 2px}
+.typing i{width:8px;height:8px;border-radius:50%;background:var(--mute);animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px 42px}
+.chip{border:1.5px solid color-mix(in srgb,var(--brand) 45%,transparent);background:var(--bg);color:var(--brandink);border-radius:99px;padding:8px 14px;min-height:44px;font-size:15.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.chip.main{background:var(--fill);color:#fff;border-color:var(--fill)}
+.chip.red{background:var(--fillred);color:#fff;border-color:var(--fillred)}
+.chip.dim{color:var(--mute);border-color:var(--line);font-weight:500}
+.mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
+.mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
+.me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
+.mini div{margin:2px 0}
+.res{width:min(320px,86%);background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 2px 10px -4px #0003}
+.res .top{padding:16px 16px 12px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.res.high .top{background:var(--redsoft)}.res.mid .top{background:var(--ambersoft)}.res.low .top{background:var(--greensoft)}
+.tl{display:grid;gap:5px;background:#1a1b29;border-radius:14px;padding:7px}
+.tl i{width:18px;height:18px;border-radius:50%;background:#3a3b4d}
+.tl i.r.on{background:#ff5a52;box-shadow:0 0 10px #ff5a52}.tl i.a.on{background:#ffb02e;box-shadow:0 0 10px #ffb02e}.tl i.g.on{background:#3ccf7f;box-shadow:0 0 10px #3ccf7f}
+.res h3{margin:0;font-size:22px;line-height:1.25;font-weight:900}
+.res.high h3{color:var(--red)}.res.mid h3{color:var(--amber)}.res.low h3{color:var(--green)}
+.res .body{padding:12px 16px 14px;font-size:15.5px}
+.res .type{font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.tag{background:var(--redsoft);color:var(--red);border-radius:99px;padding:2px 10px;font-size:13px;font-weight:700}
+.res.mid .tag{background:var(--ambersoft);color:var(--amber)}
+.res .btns{display:grid;gap:8px;padding:0 16px 16px}
+.btn{border:0;border-radius:16px;padding:12px 16px;min-height:50px;font-weight:700;font-size:16.5px;background:var(--fill);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn.red{background:var(--fillred)}
+.btn.soft{background:var(--brandsoft);color:var(--brandink)}
+.btn.plain{background:var(--sub);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.badge{display:inline-flex;font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px;background:var(--greensoft);color:var(--green)}
+.badge.m{background:var(--ambersoft);color:var(--amber)}
+.rep{width:min(320px,86%);background:var(--card);border-radius:22px;padding:14px 16px;box-shadow:0 2px 10px -4px #0003}
+.rep h4{margin:0 0 6px;font-size:17px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.rep pre{white-space:pre-wrap;font:inherit;font-size:14.5px;margin:0;max-height:150px;overflow:hidden;position:relative;color:var(--ink)}
+.rep .att{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mute)}
+.rep .att img{width:34px;height:34px;object-fit:cover;border-radius:8px}
+.rep .att span.ic{width:34px;height:34px;border-radius:8px;background:var(--sub);display:grid;place-items:center}
+.stat{width:min(320px,86%);background:var(--card);border-radius:22px;padding:14px 16px;box-shadow:0 2px 10px -4px #0003}
+.stat ol{list-style:none;margin:8px 0 0;padding:0}
+.stat li{display:flex;gap:10px;align-items:center;color:var(--mute);padding:4px 0}
+.stat li::before{content:"";width:16px;height:16px;border-radius:50%;border:2px solid var(--line);flex:none}
+.stat li.on{color:var(--ink);font-weight:700}.stat li.on::before{background:var(--green);border-color:var(--green)}
+.numcard{display:grid;gap:8px;margin-top:8px}
+.numcard div{display:flex;justify-content:space-between;gap:10px;background:var(--sub);border-radius:12px;padding:8px 12px;font-size:15px}
+.numcard b{white-space:nowrap}
+.compose{display:flex;gap:6px;align-items:flex-end;padding:8px 10px 10px;border-top:1px solid var(--line);background:var(--bg)}
+.compose textarea{flex:1;border:1.5px solid var(--line);border-radius:22px;padding:10px 14px;background:var(--sub);font-size:16px;line-height:1.45;max-height:120px;min-height:46px;resize:none}
+.circ{width:46px;height:46px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--sub);color:var(--ink);flex:none}
+.circ.send{background:var(--fill);color:#fff}
+.circ.rec{background:var(--fillred);color:#fff;animation:pu 1.2s infinite}
+@keyframes pu{50%{box-shadow:0 0 0 8px #dc2f2f33}}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 10px}
+.sec h3{margin:0;font-size:18px}
+h2.hi{font-size:26px;line-height:1.2;font-weight:900;margin:10px 0 4px}
+.lede{color:var(--mute);margin:0 0 14px;font-size:15.5px}
+.card{background:var(--sub);border-radius:20px;padding:14px 16px;margin-bottom:12px}
+.faces{display:flex;justify-content:center;gap:14px;margin:12px 0}
+.slot{display:grid;justify-items:center;gap:6px;width:86px;border:0;background:none;padding:0}
+.face{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;font-size:27px;font-weight:900;color:#fff;position:relative}
+.face.empty{border:2px dashed var(--line);color:var(--mute)}
+.face .st{position:absolute;right:-2px;bottom:-2px;width:24px;height:24px;border-radius:50%;border:3px solid var(--bg);background:var(--green)}
+.face .st.wait{background:var(--amber)}
+.slot .face{color:#fff}.slot .face.empty{color:var(--mute)}.slot b{font-size:14.5px}.slot span{font-size:12.5px;color:var(--mute)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px}
+.sw:first-child{border-top:0}
+.sw input{appearance:none;width:52px;height:32px;border-radius:99px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:.2s}
+.sw input::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0003;transition:.2s}
+.sw input:checked{background:var(--green)}.sw input:checked::after{left:23px}
+.pv{background:var(--bg);border-radius:16px;padding:12px;display:grid;grid-template-columns:36px 1fr;gap:10px;box-shadow:0 4px 14px -6px #0003;font-size:14.5px}
+.pv .logo{width:36px;height:36px;border-radius:10px;font-size:15px}
+.cando{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14.5px}
+.cando ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.y{color:var(--green);font-weight:900}.n{color:var(--red);font-weight:900}
+.reel{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rv{border:0;background:none;padding:0;text-align:left;position:relative}
+.rv img{width:100%;aspect-ratio:9/14;object-fit:cover;border-radius:18px;display:block;background:var(--sub)}
+.rv .play{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#fffffff0;color:#111;display:grid;place-items:center}
+.rv b{display:block;font-size:15.5px;margin-top:6px}.rv>span:last-child{font-size:13px;color:var(--mute)}
+.vok{position:absolute;right:8px;top:8px;background:var(--green);color:#fff;border-radius:99px;font-size:12px;font-weight:700;padding:2px 8px}
+.pts{background:var(--fill);color:#fff;border-radius:22px;padding:16px 18px;margin:8px 0 4px}
+.pts .n{font:800 36px/1 Inter,sans-serif}
+.meter{height:10px;border-radius:9px;background:#ffffff33;margin:10px 0 6px;overflow:hidden}.meter i{display:block;height:100%;background:#fff}
+.rw{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.rw:first-child{border-top:0}
+.rw b{display:block;font-size:15.5px}.rw span{font-size:13px;color:var(--mute)}
+.small{min-height:42px;padding:6px 14px;font-size:15px;width:auto}
+.vp{background:#000;border-radius:22px;overflow:hidden;margin:4px 0 10px}
+.vp video{width:100%;max-height:520px;aspect-ratio:9/16;display:block;background:#000}
+.prog{height:8px;border-radius:9px;background:var(--line);overflow:hidden}.prog i{display:block;height:100%;width:0;background:var(--brand)}
+.dots{display:flex;gap:6px}.dots i{width:28px;height:6px;border-radius:9px;background:var(--line)}.dots i.on{background:var(--brand)}
+.ans{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:14px;margin-bottom:10px;font-size:16.5px;min-height:56px}
+.ans.right{border-color:var(--green);background:var(--greensoft)}.ans.wrong{border-color:var(--red);background:var(--redsoft)}
+.link{border:0;background:none;color:var(--brand);font-weight:700;font-size:15px;min-height:44px;padding:0}
+.overlay{position:absolute;inset:0;background:#0007;display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:.25s;z-index:5}
+.overlay.on{opacity:1;visibility:visible}
+.sheet{background:var(--bg);width:100%;max-height:88%;overflow:auto;border-radius:26px 26px 0 0;padding:10px 18px 22px;transform:translateY(30px);transition:.25s}
+.overlay.on .sheet{transform:none}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sheet h3{margin:0 0 6px;font-size:20px}
+.sheet textarea,.sheet input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);font-size:16px}
+.sheet textarea{min-height:240px;line-height:1.6}
+.bank{border-radius:18px;overflow:hidden;border:1.5px solid var(--line);margin:8px 0 12px}
+.bank .bar{background:#0f5132;color:#fff;padding:10px 14px;font-weight:700;display:flex;justify-content:space-between}
+.bank .in{padding:12px 14px;font-size:15px}
+.bank ul{margin:4px 0 8px;padding-left:20px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:15.5px}
+.chk input{width:22px;height:22px;accent-color:var(--brand);flex:none;margin-top:2px}
+.rels{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.rels button{border:1.5px solid var(--line);background:var(--bg);border-radius:99px;padding:8px 14px;min-height:42px}
+.rels button[aria-pressed=true]{border-color:var(--brand);background:var(--brandsoft);color:var(--brandink);font-weight:700}
+.full .b{background:var(--chat);border-radius:14px;padding:8px 12px;margin:6px 0;font-size:15px}
+.full .b.hit{background:var(--redsoft);box-shadow:inset 3px 0 0 var(--red)}
+.full .b small{display:block;color:var(--mute);font-size:12.5px}
+.full .b em{font-style:normal;color:var(--red);font-weight:700}
+.toast{position:absolute;left:16px;right:16px;bottom:150px;background:var(--ink);color:var(--bg);border-radius:16px;padding:12px 14px;font-size:15px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:9}
+.toast.on{opacity:1;transform:none}
+.notif{position:absolute;left:10px;right:10px;top:40px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:0 14px 30px -10px #0005;display:grid;grid-template-columns:36px 1fr;gap:10px;font-size:14px;opacity:0;visibility:hidden;transform:translateY(-16px);transition:.3s;z-index:8}
+.notif.on{opacity:1;visibility:visible;transform:none}
+.notif .logo{width:36px;height:36px;border-radius:10px;font-size:15px}
+.side h2{font-size:clamp(30px,4vw,44px);line-height:1.08;letter-spacing:-.02em;margin:10px 0 12px;text-wrap:balance}
+.side>p{max-width:58ch;color:var(--mute);margin:0 0 20px}
+.sc{background:var(--card);border-radius:24px;padding:18px 22px;margin-bottom:16px}
+.sc h3{margin:0;font-size:18px}
+.task{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.task:first-of-type{border-top:0}
+.tick{width:32px;height:32px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:#fff}
+.task.ok .tick{background:var(--green);border-color:var(--green)}
+.task b{display:block;font-size:16px}.task span{font-size:14px;color:var(--mute)}
+.pill{display:inline-flex;border-radius:99px;padding:3px 12px;font-size:13px;font-weight:700;background:var(--redsoft);color:var(--red)}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);justify-items:center}.side{max-width:560px;width:100%}.phone{position:static;width:100%;max-width:410px}}
+@media(max-width:520px){.wrap{padding:0 0 32px;gap:22px}.phone{border-radius:0;padding:0;box-shadow:none;max-width:none;background:none}.screen{border-radius:0;height:100svh;min-height:560px}.side{padding:0 16px}}
+html:not(.demo) .wrap{display:block;max-width:none;padding:0}
+html:not(.demo) .side{display:none}
+html:not(.demo) .phone{position:static;padding:0;border-radius:0;box-shadow:none;background:var(--page);max-width:520px;margin:0 auto}
+html:not(.demo) .screen{border-radius:0;height:100svh;min-height:0}
+html:not(.demo) .status{display:none}
+html:not(.demo) .head{padding-top:calc(10px + env(safe-area-inset-top))}
+html:not(.demo) .tabs{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+@media(min-width:521px){html:not(.demo) .screen{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="phone">
+    <div class="screen" id="screen">
+      <div class="status"><span>9:41</span><span>5G</span></div>
+      <div class="head" id="head"></div>
+      <div class="view" id="view"></div>
+      <div id="compose"></div>
+      <nav class="tabs" id="tabs" aria-label="主選單"></nav>
+      <input type="file" id="shotin" accept="image/*" multiple hidden>
+      <input type="file" id="morein" accept="image/*,application/pdf" multiple hidden>
+      <div class="toast" id="toast" role="status"></div>
+      <div class="notif" id="notif" role="status"></div>
+      <div class="overlay" id="overlay"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+    </div>
+  </div>
+  <aside class="side">
+    <span class="pill">展示模式</span>
+    <h2>像問朋友一樣：傳過來，就告訴你下一步</h2>
+    <p>把可疑的截圖或對話傳給 Whoscam 小幫手，它回你紅綠燈和一個最該做的事；被騙了也是一題一題陪你處理，報告直接寫好送銀行。截圖在你的手機上辨識，不會上傳；判斷用防詐規則。銀行與商家均為虛構。</p>
+    <div class="sc"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h3>可用性測試任務</h3><button class="link" id="reset">重設原型</button></div><div id="tasks"></div></div>
+  </aside>
+</div>
+<script>
+{
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const P = {
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>', people:'<circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="9" r="3"/><path d="M2.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M12 15c1-.4 2.6-.6 4.5-.5 2.5.2 4.2 1.8 5 4.5"/>',
+  film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>', sos:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M12 8v5M12 16.2v.3"/>',
+  img:'<rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.8"/><path d="M20 16l-5-5-8 9"/>', send:'<path d="M5 12l14-7-5 15-3-6z"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0013 0M12 17.5V21"/>', phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a1 1 0 01-1 1A16 16 0 014 5a1 1 0 011-1z"/>',
+  speak:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a7.5 7.5 0 010 11"/>', check:'<path d="M5 12.5l4.5 4.5L19 7"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  text:'<path d="M5 6h14M5 11h14M5 16h9"/>', shield:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>', play:'<path d="M8 5l11 7-11 7z" fill="currentColor"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>', copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>', edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>', bank:'<path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>'
+};
+const I = (k, x = '') => `<svg class="i" viewBox="0 0 24 24" ${x}>${P[k]}</svg>`;
+
+const SCEN = [
+ {id:'inv', name:'投資群組', text:`【第 1 天】\n陳老師：歡迎加入「穩健財富交流群」，我每天分享免費盤勢分析。\n我：謝謝老師！\n【第 6 天】\n陳老師：上週跟單的同學都賺了 18%，這個平台保證獲利、穩賺不賠。\n陳老師：名額有限，私訊助理小美開戶。\n【第 14 天】\n助理小美：老師今天開放最後 3 個名額，今晚 9 點前入金 5 萬就能參加。\n助理小美：請匯款到以下帳戶 012-3456-7890-12，戶名王小明。\n助理小美：這是內部機會，不要跟家人說，銀行問就說是買家具。`},
+ {id:'friend', name:'老朋友借錢', text:`對方：好久不見！我換新號碼了，猜猜我是誰？\n我：是阿明嗎？\n對方：對啦老朋友！我現在有點急，可以先借我 10 萬周轉嗎？\n對方：你網銀可以一筆轉十萬嗎？今天下午前要。\n對方：先不要跟別人說，有點丟臉。`},
+ {id:'cop', name:'自稱檢察官', text:`自稱檢察官：你的帳戶涉及洗錢案，現在要監管你的資產。\n自稱檢察官：這是偵查不公開，不可以告訴任何人，包括家人。\n自稱檢察官：30 分鐘內到 ATM 依指示操作，否則立即拘提。`},
+ {id:'fam', name:'家人聊天', text:`姐姐：週末回家吃飯嗎？\n我：好啊，要帶什麼？\n姐姐：帶個水果就好，媽說想吃芭樂。\n姐姐：上次聚餐的錢 600，有空再轉我就好，不急。`}
+];
+const RULES = [
+ {k:'pressure', name:'限時壓力', tip:'催你立刻決定，讓你沒時間查證', w:2, re:/(今天|今晚|馬上|立即|立刻|名額|最後|限時|\d+\s*分鐘內|前入金|來不及|否則|今天沒付|下午前)/},
+ {k:'secrecy', name:'要你保密', tip:'不讓你問家人或銀行，是最危險的訊號', w:3, re:/(不要跟|不可以告訴|不能告訴|別告訴|保密|偵查不公開|不要說|就說是)/},
+ {k:'money', name:'要求轉帳', tip:'出現帳號、網銀、入金、ATM 或點數卡', w:2, re:/(匯款|轉帳|轉我|轉給|入金|帳戶|帳號|網銀|ATM|點數卡|遊戲點數|虛擬貨幣|USDT|訂金|付款|監管|一筆轉|借我)/i},
+ {k:'profit', name:'保證獲利', tip:'合法投資一定有風險，不會穩賺不賠', w:3, re:/(保證獲利|穩賺|不賠|保本|月賺|跟單|帶單|賺了\s*\d+%)/},
+ {k:'authority', name:'假冒公權力', tip:'檢警不會在電話裡要你交錢', w:2, re:/(檢察官|地檢署|法院|洗錢|拘提)/},
+ {k:'imperson', name:'假冒熟人', tip:'自稱老朋友或換了新號碼，突然跟你要錢', w:3, re:/(老朋友|老同學|換.{0,3}(號碼|手機|LINE)|新(號碼|帳號)|猜猜我是誰|周轉)/i},
+ {k:'platform', name:'要你換平台', tip:'離開平台就失去保障', w:1, re:/(加我\s*LINE|私訊|下載.{0,6}App|私下交易)/i},
+ {k:'link', name:'陌生連結', tip:'付款或登入連結可能是釣魚網站', w:1, re:/(https?:\/\/|點這個連結)/i}
+];
+const CALM = /(不急|有空再)/;
+const LV = {high:{n:'高風險', a:'先不要付款', on:'r'}, mid:{n:'有點可疑', a:'先停下來查證', on:'a'}, low:{n:'看起來安全', a:'仍可保持留意', on:'g'}};
+const VIDEOS = [
+ {id:'v1', t:'老師帶你穩賺？', s:'假投資', qs:[['投資群組說「保證獲利、穩賺不賠」，最可能是？',['正常的理財建議','假投資的典型話術','銀行的官方活動'],1,'合法的投資一定有風險，「保證獲利」本身就是警訊。'],['助理要你「銀行問就說是買家具」，你應該？',['照做以免麻煩','停止匯款，向銀行說實話','換一家銀行匯款'],1,'教你對銀行說謊，是為了避開行員的關懷提問。'],['想確認投資平台是否合法，最好的方法是？',['問群組裡的其他人','查金管會公告的合法業者','看平台的獲利截圖'],1,'群組成員和截圖都可能是假的。']]},
+ {id:'v2', t:'私下交易比較便宜？', s:'假網購', qs:[['賣家要你離開平台「私下交易」，風險是？',['沒有平台保障，付款後可能失聯','比較便宜沒有風險','運費比較少'],0,'一離開平台，付款糾紛就沒人幫你處理。'],['「今天沒付就賣給別人」屬於哪種訊號？',['要你保密','限時壓力','保證獲利'],1,'製造急迫感，是為了不讓你多想。'],['對方傳來付款連結，你應該？',['直接點開付款','只用平台內的官方付款','把連結轉給朋友'],1,'陌生付款連結常是釣魚網站。']]},
+ {id:'v3', t:'檢察官要監管帳戶？', s:'假檢警', qs:[['檢警會在電話中要你把錢交給他們「監管」嗎？',['會','不會','只在晚上會'],1,'沒有任何機關會用電話要你交出資產。'],['對方說「偵查不公開，不能告訴家人」，你應該？',['掛掉電話，打 165 查證','照做以免被拘提','先轉一部分錢'],0,'要你對家人保密，就是怕你被提醒。'],['要查證對方身分，應該打哪支電話？',['對方提供的電話','自己查的官方電話或 165','簡訊裡的電話'],1,'對方給的電話可能也是詐騙集團的。']]},
+ {id:'v4', t:'訂單設定錯誤？', s:'假客服', qs:[['客服說要你到 ATM「解除分期」，這是？',['正常流程','假客服詐騙','銀行新服務'],1,'ATM 沒有「解除分期」的功能。'],['接到可疑客服來電，第一步是？',['依指示操作網銀','掛斷，自己撥官方客服查證','提供卡號確認身分'],1,'掛斷後用自己查到的號碼回撥。'],['網銀或 ATM 能「取消分期付款」嗎？',['可以','不能，這是詐騙話術','要看銀行'],1,'這是假客服最常用的說法。']]}
+];
+const SHOP = [{id:'r1',n:'示範咖啡 中杯拿鐵',p:300},{id:'r2',n:'示範超商 50 元折價券',p:200},{id:'r3',n:'家庭方案折抵 NT$50',p:500}];
+const TASKS = [['t1','檢查一段可疑對話，照建議做下一步','傳截圖或點「試試範例」→ 看紅綠燈 → 按一個建議'],['t2','邀請一位家人加入守護圈，再撤回','家人守護 → 空位 + → 模擬對方同意 → 移除或暫停'],['t3','「我已經匯款了」，把報告送到銀行','按右上「我被騙了」，60 秒內送出即成功（會計時）'],['t4','看一部防詐小劇場並答對測驗','三題全對才拿到點數']];
+const COLORS = ['#4f46e5','#0e9f6e','#d97706','#db2777'];
+
+const fresh = () => ({tab:'chat', page:null, msgs:[], busy:false, shots:[], result:null, flow:null,
+  circle:[{id:1,name:'志明',rel:'弟弟',status:'active',c:0}], trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
+  rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
+let S = fresh();
+let SAMPLE = null, TTS = null, DICT = null;
+if (/[?&]demo/.test(location.search)) document.documentElement.classList.add('demo');
+function webTTS(){ if (!('speechSynthesis' in window)) return null;
+  return {speak:(text, o = {}) => new Promise(res => { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-TW'; u.rate = o.rate || 1;
+    const v = speechSynthesis.getVoices().find(v => /zh[-_]TW/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^zh/i.test(v.lang)); if (v) u.voice = v; u.onend = u.onerror = res; speechSynthesis.speak(u); })}; }
+function webDict(){ const R = window.SpeechRecognition || window.webkitSpeechRecognition; if (!R) return null; let rec = null, cb = {};
+  return {onPartial(f){ cb.p = f; }, onFinal(f){ cb.f = f; }, onState(f){ cb.s = f; },
+    start(){ rec = new R(); rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = false;
+      rec.onresult = e => { let t = ''; for (const r of e.results) t += r[0].transcript; const fin = e.results[e.results.length - 1].isFinal; (fin ? cb.f : cb.p) && (fin ? cb.f : cb.p)({text:t}); };
+      rec.onstart = () => cb.s && cb.s({state:'listening'}); rec.onend = () => cb.s && cb.s({state:'idle'}); rec.onerror = () => cb.s && cb.s({state:'idle'});
+      rec.start(); return Promise.resolve(); },
+    stop(){ if (rec) rec.stop(); return Promise.resolve(); }}; }
+let TESS = null;
+function loadTess(){ return TESS || (TESS = new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; s.onload = () => res(window.Tesseract); s.onerror = () => { TESS = null; rej({code:'offline'}); }; document.head.appendChild(s); })); }
+async function localOCR(files){ const T = await loadTess(); const w = await T.createWorker('chi_tra'); const out = [];
+  try { for (const f of files){ const {data} = await w.recognize(await shrink(f)); out.push(...String(data.text || '').split(/\n+/)); } } finally { w.terminate(); }
+  const lines = out.map(l => l.replace(/(?<=[\u3400-\u9fff\uff00-\uffef])\s+(?=[\u3400-\u9fff\uff00-\uffef0-9])/g, '').replace(/(?<=[0-9])\s+(?=[\u3400-\u9fff])/g, '').trim())
+    .filter(l => l.length >= 2 && !/^(上午|下午)?\s*\d{1,2}[:：]\d{2}$/.test(l) && !/^已讀/.test(l) && /[\u3400-\u9fff]/.test(l));
+  if (!lines.length) throw {code:'empty'}; return lines.join('\n'); }
+(async () => { if (!(window.claude && window.claude.use)){ TTS = webTTS(); DICT = webDict(); return; } try { if (window.claude && window.claude.use){ [SAMPLE, TTS, DICT] = await Promise.all([window.claude.use('sample'), window.claude.use('tts'), window.claude.use('dictation')]); render(); } } catch (e) {} })();
+
+// ---------- analysis ----------
+function analyse(raw){
+  const out = []; let day = ''; const found = {}, first = {};
+  raw.split(/\n/).map(l => l.trim()).filter(Boolean).forEach(l => {
+    const d = l.match(/^【(.+)】$/); if (d){ day = d[1]; out.push({day}); return; }
+    const m = l.match(/^([^：:]{1,10})[：:](.*)$/); const who = m ? m[1].trim() : ''; const text = m ? m[2].trim() : l;
+    const calm = CALM.test(l); const hits = RULES.filter(r => r.re.test(l) && !(r.k === 'pressure' && calm)).map(r => r.k);
+    hits.forEach(k => { found[k] = (found[k] || 0) + 1; if (!first[k]) first[k] = text; });
+    out.push({who, text, me:who === '我', hits, day});
+  });
+  let score = RULES.reduce((s, r) => s + (found[r.k] ? r.w : 0), 0);
+  if (found.money && found.pressure) score += 2; if (found.money && found.secrecy) score += 2;
+  if (found.money && !found.pressure && !found.secrecy && !found.profit && !found.authority && !found.imperson) score = Math.min(score, 2);
+  const level = score >= 6 ? 'high' : score >= 3 ? 'mid' : 'low'; const names = RULES.filter(r => found[r.k]).map(r => r.name);
+  const type = found.profit ? '假投資' : found.authority ? '假檢警' : found.imperson ? '假冒熟人借錢' : found.link ? '假網購' : level === 'low' ? '一般對話' : '可疑對話';
+  const why = level === 'high' ? (found.profit ? '保證獲利、限時入金又要你保密，這是假投資最常見的組合。' : found.authority ? '真正的檢警不會要你交錢監管，也不會要你對家人保密。' : found.imperson ? '自稱老朋友、突然急著借錢又要你保密，先打給本人確認。' : '對方一直催你付款，又不讓你查證。') : level === 'mid' ? '不一定是詐騙，但已經值得停下來，用官方管道查一下。' : names.length ? '有提到轉帳，但沒有催促或保密，像一般對話。' : '沒有發現常見的詐騙訊號。';
+  return {level, found, first, names, why, type, lines:out, ai:false};
+}
+const maskText = t => t.replace(/\b(\d{3})[-\s]?\d{3,4}[-\s]?\d{3,4}[-\s]?(\d{2,4})\b/g, '$1-****-****-$2').replace(/[A-Z][12]\d{8}/g, m => m[0] + '*******' + m.slice(-2)).replace(/(09\d{2})-?\d{3}-?(\d{3})/g, '$1-***-$2');
+async function askJSON(prompt, opts){
+  try { const v = await SAMPLE.json(prompt, opts); if (v && typeof v === 'object') return v; } catch (e) { if (e && (e.code === 'not_granted' || e.code === 'rate_limited')) throw e; }
+  const r = await SAMPLE(prompt, opts); const m = String(r.text || '').match(/\{[\s\S]*\}/); if (!m) throw {code:'bad_json'}; return JSON.parse(m[0]);
+}
+async function shrink(file){ try { const b = await createImageBitmap(file); const k = Math.min(1, 2000 / Math.max(b.width, b.height)); if (k >= 1 && file.size < 1.5e6) return file;
+  const c = document.createElement('canvas'); c.width = Math.round(b.width * k); c.height = Math.round(b.height * k); c.getContext('2d').drawImage(b, 0, 0, c.width, c.height); return await new Promise(r => c.toBlob(x => r(x || file), 'image/jpeg', 0.88)); } catch (e) { return file; } }
+const OCR_PROMPT = `你是聊天截圖的文字辨識工具。依照圖片順序，逐則還原截圖中的對話。
+規則：右側的對話泡泡（LINE 通常是綠色）是使用者本人，who 填「我」；左側是對方，看得到名稱就用名稱，看不到就填「對方」。日期分隔列輸出為 {"type":"day","text":"..."}。忽略時間、已讀、輸入框、系統提示；照片、貼圖、語音寫成「[圖片]」「[貼圖]」「[語音]」。文字照原樣，不要改寫。
+只輸出 JSON：{"items":[{"type":"msg","who":"我","text":"..."}]}`;
+async function ocr(files){
+  if (!SAMPLE) return localOCR(files); const lim = await SAMPLE.limits(); if (!lim || !lim.images) throw {code:'no_images'};
+  const out = await askJSON(OCR_PROMPT, {images:await Promise.all(files.map(shrink)), modelTier:'default'});
+  const lines = (Array.isArray(out.items) ? out.items : []).map(it => it && it.type === 'day' ? `【${String(it.text || '').slice(0, 20)}】` : (it && it.text ? `${String(it.who || '對方').replace(/[：:\n]/g, '').slice(0, 10) || '對方'}：${String(it.text).replace(/\n/g, ' ')}` : '')).filter(Boolean);
+  if (!lines.some(l => !l.startsWith('【'))) throw {code:'empty'}; return lines.join('\n');
+}
+const CODES = {pressure:1, secrecy:1, money:1, profit:1, authority:1, platform:1, link:1, imperson:1};
+async function aiAnalyse(text){
+  const base = analyse(text); const msgs = base.lines.filter(l => l.who !== undefined); if (!SAMPLE || !msgs.length) throw {code:'unavailable'};
+  const numbered = msgs.map((m, i) => `[${i + 1}] ${m.who || '（描述）'}：${m.text}`).join('\n');
+  const out = await askJSON(`你是台灣的防詐騙分析助手。以下是使用者傳來的對話，或使用者用自己的話描述的狀況（「我」是使用者本人）。看整段脈絡判斷使用者是否可能正在遭遇詐騙。
+訊號代碼只能用：pressure（限時壓力）、secrecy（要你保密）、money（要求轉帳或付款）、profit（保證獲利）、authority（假冒公權力）、platform（要你換平台）、link（陌生連結）、imperson（假冒熟人）。
+level：high＝多個訊號同時出現或對方已在要錢；mid＝有可疑之處；low＝一般對話。
+只輸出 JSON：{"level":"high|mid|low","type":"詐騙類型，例如假冒熟人借錢；不像詐騙填一般對話","why":"給使用者的一句白話，35 字以內","signals":[{"code":"money","line":3,"quote":"關鍵字句，20 字內"}]}
+內容：
+${numbered}`, {modelTier:'default'});
+  const level = ['high','mid','low'].includes(out.level) ? out.level : base.level; const found = {}, first = {}; msgs.forEach(m => m.hits = []);
+  (Array.isArray(out.signals) ? out.signals : []).forEach(s => { if (!s || !CODES[s.code]) return; found[s.code] = (found[s.code] || 0) + 1; const m = msgs[(+s.line || 0) - 1]; if (m && !m.hits.includes(s.code)) m.hits.push(s.code); if (!first[s.code]) first[s.code] = String(s.quote || (m ? m.text : '')).slice(0, 40); });
+  return {level, found, first, names:RULES.filter(r => found[r.k]).map(r => r.name), why:String(out.why || base.why).slice(0, 80), type:String(out.type || base.type).slice(0, 20), lines:base.lines, ai:true};
+}
+
+// ---------- chat engine ----------
+function bot(m){ S.msgs.push(Object.assign({from:'bot'}, m)); }
+function me(m){ S.msgs.forEach(x => { if (x.kind === 'chips') x.used = true; }); S.msgs.push(Object.assign({from:'me'}, m)); }
+function typing(){ S.msgs.push({from:'bot', kind:'typing'}); render(); }
+function untype(){ S.msgs = S.msgs.filter(m => m.kind !== 'typing'); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function chips(list){ S.msgs.push({from:'bot', kind:'chips', chips:list}); }
+function greet(){
+  bot({kind:'text', text:['嗨，我是 Whoscam 防詐小幫手。', '收到怪怪的訊息嗎？把對話截圖或文字傳給我，30 秒告訴你風險和下一步。']});
+  chips([{t:'傳截圖給我', a:'shot', main:true, ic:'img'}, {t:'用打字或貼上', a:'paste', ic:'text'}, {t:'試試範例', a:'examples'}, {t:'我可能已經被騙了', a:'sos', red:true}]);
+}
+async function analyseText(text, scen, label, shots, noEcho){
+  S.flow = null; if (!noEcho){ if (shots && shots.length) me({kind:'img', urls:shots}); else me({kind:'conv', label, text}); }
+  typing(); const t0 = Date.now(); let r;
+  if (scen) r = analyse(maskText(text)); else { try { r = await aiAnalyse(maskText(text)); } catch (e) { r = analyse(maskText(text)); r.aiFail = true; } }
+  r.text = text; r.scen = scen; S.result = r; await wait(Math.max(0, 1300 - (Date.now() - t0)));
+  untype(); bot({kind:'result', r});
+  const list = r.level === 'low' ? [{t:'再檢查另一段', a:'shot', ic:'img'}, {t:'為什麼這樣判斷？', a:'why'}] :
+    [{t:'我已經匯款了', a:'paid', red:true}, {t:'請家人幫我看', a:'family'}, {t:'為什麼危險？', a:'why'}];
+  if (TTS) list.push({t:'唸給我聽', a:'speak', ic:'speak'});
+  chips(list); render();
+  if (r.level === 'high' && S.trig.high) fireCircle('高風險檢查結果');
+}
+async function handleShots(files){
+  const urls = files.map(f => URL.createObjectURL(f)); S.shots = urls;
+  me({kind:'img', urls}); if (!SAMPLE){ bot({kind:'text', text:['我在你的手機上讀截圖，第一次要下載中文字庫，大約 10–30 秒。']}); } typing();
+  try { const text = await ocr(files); untype(); bot({kind:'text', text:[`我讀到 ${text.split('\n').filter(l => !l.startsWith('【')).length} 則訊息，正在看整段對話…`]}); render();
+    await analyseText(text, '', '', urls, true);
+  } catch (e) { untype();
+    const why = e && e.code === 'not_granted' ? '你還沒有允許原型使用 Claude，所以我讀不到截圖。' : e && e.code === 'empty' ? '截圖裡沒有讀到對話文字，換一張清楚一點的試試。' : e && e.code === 'offline' ? '需要網路才能下載截圖辨識的字庫。' : !SAMPLE ? '這張截圖沒有讀成功。' : '這次沒有讀成功。';
+    bot({kind:'text', text:[why, '你也可以把對話文字複製貼上給我。']}); chips([{t:'再傳一次截圖', a:'shot', ic:'img'}, {t:'改用貼上文字', a:'paste', ic:'text'}, {t:'試試範例', a:'examples'}]); render(); }
+}
+function fireCircle(reason, manual){
+  const act = S.circle.filter(m => m.status === 'active'); if (!act.length || S.paused) return false;
+  const r = S.result; const kind = r && r.type && r.type !== '一般對話' ? '疑似' + r.type.replace(/^疑似/, '') : '可疑狀況';
+  const body = `你關心的家人剛遇到${kind}${S.share && r ? '（' + r.names.slice(0, 3).join('、') + '）' : ''}，打個電話問候吧。`;
+  S.log.unshift({to:act.map(m => m.name).join('、'), reason, t:new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit'})});
+  notify(`已通知 ${act.map(m => m.name).join('、')}`, body); return true;
+}
+
+// ---------- recover flow ----------
+function acctOf(){ const r = S.result; if (!r) return ''; const m = r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/); return m ? m[0] : ''; }
+function attachList(){ const R = S.rec, list = []; S.shots.forEach((u, i) => list.push({k:'img', u, n:`截圖 ${i + 1}`}));
+  if (S.result) list.push({k:'txt', n:`對話紀錄 ${S.result.lines.filter(l => l.who !== undefined).length} 則`}, {k:'res', n:`檢查結果：${LV[S.result.level].n}`}); (R ? R.extra : []).forEach(x => list.push(x)); return list; }
+function templateReport(){ const R = S.rec, r = S.result, act = S.circle.find(m => m.status === 'active');
+  const keys = r ? RULES.filter(x => r.found[x.k]).map(x => `「${(r.first[x.k] || '').slice(0, 24)}」`).slice(0, 3) : []; const kind = r && r.type !== '一般對話' ? r.type : '可疑來電或訊息';
+  if (R.who === 'family') return `【疑似詐騙關懷通報】\n通報人：${act ? act.name + '的家人' : '家人'}（Whoscam 守護圈成員）\n關心對象：${act ? act.name : '守護圈成員'}\n觀察到的狀況：${R.note || '尚未填寫'}\n${r ? `Whoscam 檢查結果：${LV[r.level].n}，疑似${kind}\n` : ''}請求：請於本人臨櫃或轉帳時加強關懷提問，必要時聯繫通報人。\n說明：家屬通報僅作為關懷線索，不要求凍結帳戶。`;
+  return `【疑似詐騙通報】\n通報人：本人（帳戶持有人）\n事件類型：疑似${kind}${r ? `（Whoscam 檢查：${LV[r.level].n}）` : ''}\n發生經過：${r ? r.why : '接到可疑來電或訊息，對方要求轉帳。'}\n${keys.length ? `關鍵訊息：\n${keys.map((k, i) => `${i + 1}. ${k}`).join('\n')}\n` : ''}對方帳號：${acctOf() || '尚未取得'}\n已匯出金額：新台幣 ${Number(R.amount || 0).toLocaleString('en-US')} 元\n請求：請協助風險複核、暫停可疑交易，並提供帳戶保護建議；必要時協助通報警方。`; }
+async function writeReport(){ const R = S.rec; R.report = templateReport(); R.by = 'template'; if (!SAMPLE || !S.result || !S.result.ai) return;
+  try { const conv = S.result.lines.filter(l => l.who !== undefined).slice(0, 40).map((m, i) => `[${i + 1}] ${m.who || '對方'}：${m.text}`).join('\n');
+    const out = await SAMPLE(`你是協助詐騙受害者向銀行通報的助理。依下列資料寫一份可直接送給銀行防詐單位的繁體中文「${R.who === 'family' ? '疑似詐騙關懷通報' : '疑似詐騙通報'}」。
+格式固定，每項一行：【標題】、通報人、事件類型、發生經過（2–3 句，具體客觀、依時間順序）、關鍵訊息（最多 3 則，引用原文）、對方帳號、${R.who === 'family' ? '觀察到的狀況' : '已匯出金額'}、請求。不要編造資料裡沒有的姓名、帳號、時間或金額，沒有的寫「尚未取得」。只輸出報告本文。
+資料：通報人：${R.who === 'family' ? '使用者的家人' : '帳戶持有人本人'}；${R.who === 'family' ? '家人觀察：' + (R.note || '') : '已匯出：新台幣 ' + R.amount + ' 元'}
+Whoscam 檢查：${LV[S.result.level].n}；類型：${S.result.type}；說明：${S.result.why}；對方帳號：${acctOf() || '尚未取得'}
+對話：
+${conv}`, {modelTier:'default'});
+    const t = String(out.text || '').trim(); if (t.length > 40){ R.report = t.slice(0, 1600); R.by = 'ai'; } } catch (e) {} }
+function startSOS(){ S.rec = {who:'self', amount:0, extra:[], report:'', by:'', t0:Date.now(), sent:false, status:0, bank:'', note:''}; S.flow = 'paidq';
+  bot({kind:'text', text:['別慌，我陪你一步一步處理。', '錢已經轉出去了嗎？']});
+  chips([{t:'已經轉了，或給了帳密', a:'r_yes', red:true}, {t:'還沒轉', a:'r_no'}, {t:'我是擔心家人', a:'r_fam'}]); render(); }
+async function makeReport(){ S.flow = null; typing(); const t0 = Date.now(); await writeReport(); await wait(Math.max(0, 1200 - (Date.now() - t0))); untype();
+  bot({kind:'text', text:[S.rec.who === 'family' ? '我幫你寫好給銀行的關懷通報了。' : '我幫你寫好給銀行的報告了，證據也附上了。', '確認沒問題就送出，越快越好。']});
+  bot({kind:'report'}); chips([{t:'送給示範銀行 A', a:'r_bank', red:true, ic:'bank'}, {t:'其他銀行：複製報告', a:'r_other', ic:'copy'}, {t:'修改報告', a:'r_edit', ic:'edit'}, {t:'加入匯款明細', a:'r_more', ic:'plus'}]); render(); }
+function bankSheet(){ const att = attachList();
+  sheet(`<h3>送給示範銀行 A</h3><p class="lede">你會在銀行自己的頁面確認，Whoscam 看不到你的帳號密碼。</p>
+  <div class="bank"><div class="bar"><span>示範銀行 A</span><span>授權頁</span></div><div class="in"><b>Whoscam 想要：</b><ul><li>送出這份報告與 ${att.length} 項證據</li><li>查詢處理進度</li></ul><b>Whoscam 不能：</b><ul><li>看到你的帳密、餘額</li><li>幫你轉帳或取消交易</li></ul>
+  <label class="chk"><input type="checkbox" id="auth">我同意授權示範銀行 A 接收這份報告</label></div></div><button class="btn red" id="sendbank" disabled>送出</button>`);
+  $('#auth').onchange = e => $('#sendbank').disabled = !e.target.checked;
+  $('#sendbank').onclick = async () => { closeSheet(); const R = S.rec; R.sent = true; R.secs = Math.round((Date.now() - R.t0) / 1000); R.caseNo = 'WC' + String(Date.now()).slice(-6);
+    if (R.who === 'self' && R.secs <= 60) tick('t3'); if (R.who === 'self' && S.trig.recover) fireCircle('按下求助');
+    bot({kind:'status'}); render(true); for (const n of [1, 2, 3]){ await wait(1200); R.status = n; render(); }
+    bot({kind:'text', text:['銀行建議（示範）：已暫停網銀非約定轉帳 24 小時，請立即變更網銀密碼。', '確認受騙的話，也請撥 165 報案，把這份報告給警察。']});
+    chips([{t:'打 165', a:'call', ic:'phone'}, {t:'複製報告', a:'r_copy', ic:'copy'}, {t:'完成', a:'done'}]); render(true); };
+}
+function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('已複製報告'), () => toast('無法複製，請長按文字手動複製')); } catch (e) { toast('無法複製，請長按文字手動複製'); } }
+
+async function act(a){
+  const last = S.msgs.at(-1); if (last && last.kind === 'chips') last.used = true;
+  const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full'].includes(a)) me({kind:'text', text:[label]});
+  if (a === 'shot'){ $('#shotin').click(); render(); return; }
+  if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
+  if (a === 'examples'){ bot({kind:'text', text:['選一段範例對話試試看：']}); chips(SCEN.map(s => ({t:s.name, a:'ex:' + s.id}))); render(true); return; }
+  if (a.startsWith('ex:')){ const s = SCEN.find(x => x.id === a.slice(3)); S.msgs.pop(); S.shots = []; await analyseText(s.text, s.id, '範例：' + s.name); if (s.id === 'inv' || s.id === 'friend' || s.id === 'cop') S._ex = true; return; }
+  if (a === 'why'){ const r = S.result; bot({kind:'why', r}); chips([{t:'看整段對話標示', a:'full'}, ...(r.level === 'low' ? [] : [{t:'我已經匯款了', a:'paid', red:true}])]); render(true); return; }
+  if (a === 'full'){ fullSheet(); return; }
+  if (a === 'call'){ tick1(); bot({kind:'call'}); chips([{t:'我已經匯款了', a:'paid', red:true}, {t:'再檢查另一段', a:'shot', ic:'img'}]); render(true); return; }
+  if (a === 'family'){ tick1(); if (!S.circle.some(m => m.status === 'active')){ bot({kind:'text', text:['你還沒有邀請家人加入守護圈。', '加入後，遇到高風險時他們會收到通知。']}); chips([{t:'去邀請家人', a:'gofam', main:true}]); render(true); return; }
+    fireCircle('請你幫忙看一段對話', true); bot({kind:'text', text:[`已通知 ${S.circle.filter(m => m.status === 'active').map(m => m.name).join('、')}，他會打電話給你。`, '通知裡沒有你的對話內容，只說你需要幫忙。']}); chips([{t:'我已經匯款了', a:'paid', red:true}, {t:'再檢查另一段', a:'shot', ic:'img'}]); render(true); return; }
+  if (a === 'gofam'){ S.tab = 'family'; render(true); return; }
+  if (a === 'speak'){ speakResult(); return; }
+  if (a === 'paid' || a === 'sos'){ tick1(); startSOS(); return; }
+  if (a === 'r_no'){ bot({kind:'text', text:['很好，先不要轉！', '把對話傳給我，我幫你看是不是詐騙；或直接打電話查證。']}); chips([{t:'傳截圖給我', a:'shot', main:true, ic:'img'}, {t:'怎麼打電話查證？', a:'call', ic:'phone'}]); S.flow = null; render(true); return; }
+  if (a === 'r_fam'){ S.rec.who = 'family'; S.flow = 'note'; bot({kind:'text', text:['用一句話告訴我，你觀察到家人怎麼了？', '例如：媽媽一直講投資老師，說要去解定存。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
+  if (a === 'r_yes'){ S.flow = 'amount'; bot({kind:'text', text:['大約轉了多少？']}); chips([{t:'1 萬以下', a:'amt:5000'}, {t:'1–5 萬', a:'amt:30000'}, {t:'5–10 萬', a:'amt:80000'}, {t:'10 萬以上', a:'amt:100000'}, {t:'自己輸入', a:'amt:custom', dim:true}]); render(true); return; }
+  if (a.startsWith('amt:')){ if (a === 'amt:custom'){ bot({kind:'text', text:['在下面輸入金額就好，例如 50000。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; } S.rec.amount = +a.slice(4); await makeReport(); return; }
+  if (a === 'r_bank'){ bankSheet(); return; }
+  if (a === 'r_other'){ copyText(S.rec.report); bot({kind:'text', text:['報告已複製。現在請打電話給你的銀行，把報告內容告訴客服，或貼到銀行 App 的客服對話。']}); bot({kind:'call'}); chips([{t:'完成', a:'done'}]); render(true); return; }
+  if (a === 'r_copy'){ copyText(S.rec.report); return; }
+  if (a === 'r_edit'){ sheet(`<h3>修改報告</h3><textarea id="repedit">${esc(S.rec.report)}</textarea><button class="btn" id="repsave" style="margin-top:12px">儲存</button>`); $('#repsave').onclick = () => { S.rec.report = $('#repedit').value; S.rec.by = 'user'; closeSheet(); render(); toast('已更新報告'); }; return; }
+  if (a === 'r_more'){ $('#morein').click(); return; }
+  if (a === 'done'){ bot({kind:'text', text:['你做得很好。被騙不是你的錯，越早說出來越有機會挽回。', '還有其他訊息需要我看嗎？']}); chips([{t:'傳截圖給我', a:'shot', ic:'img'}, {t:'看防詐小劇場', a:'golearn'}]); S.flow = null; render(true); return; }
+  if (a === 'golearn'){ S.tab = 'learn'; render(true); return; }
+}
+function tick1(){ if (S.result && S.result.level !== 'low') tick('t1'); }
+async function onSend(){
+  const box = $('#msg'); const v = box.value.trim(); if (!v || S.busy) return; box.value = '';
+  if (S.flow === 'amount'){ const n = +v.replace(/[^\d]/g, ''); me({kind:'text', text:[v]}); if (!n){ bot({kind:'text', text:['請輸入數字，例如 50000。']}); render(true); return; } S.rec.amount = n; await makeReport(); return; }
+  if (S.flow === 'note'){ me({kind:'text', text:[v]}); S.rec.note = v; await makeReport(); return; }
+  S.shots = []; S.busy = true; await analyseText(v, '', ''); S.busy = false;
+}
+async function speakResult(){ const r = S.result; if (!TTS || !r) return; const txt = `${LV[r.level].n}，${LV[r.level].a}。${r.type && r.type !== '一般對話' ? '這可能是' + r.type + '。' : ''}${r.why}`;
+  try { await TTS.speak(txt, {rate:0.9}); } catch (e) { if (e && e.code === 'not_granted') { TTS = null; render(); } } }
+let dictBase = '', dictWired = false;
+function wireDict(){ if (dictWired || !DICT) return; dictWired = true;
+  DICT.onPartial(({text}) => { const b = $('#msg'); if (b) b.value = (dictBase + ' ' + text).trim(); });
+  DICT.onFinal(({text}) => { dictBase = (dictBase + ' ' + text).trim(); const b = $('#msg'); if (b) b.value = dictBase; });
+  DICT.onState(({state}) => { S.listening = state === 'listening'; const b = $('#micbtn'); if (b) b.className = 'circ' + (S.listening ? ' rec' : ''); }); }
+function startDictation(){ if (!DICT) return; wireDict(); if (S.listening){ DICT.stop().catch(() => {}); return; }
+  dictBase = ($('#msg') || {}).value || '';
+  DICT.start().catch(e => { if (e && e.code === 'not_granted'){ DICT = null; render(); } }); }
+
+// ---------- render ----------
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2600); }
+function notify(title, body){ const n = $('#notif'); n.innerHTML = `<div class="logo">W</div><div><b>${esc(title)}</b><div>${esc(body)}</div></div>`; n.classList.add('on'); clearTimeout(notify.h); notify.h = setTimeout(() => n.classList.remove('on'), 4200); }
+function sheet(h){ $('#sheet').innerHTML = `<div class="grab"></div>${h}`; $('#overlay').classList.add('on'); }
+function closeSheet(){ $('#overlay').classList.remove('on'); }
+function tick(id){ if (!S.tasks[id]){ S.tasks[id] = true; renderTasks(); } }
+const tl = on => `<div class="tl"><i class="r ${on === 'r' ? 'on' : ''}"></i><i class="a ${on === 'a' ? 'on' : ''}"></i><i class="g ${on === 'g' ? 'on' : ''}"></i></div>`;
+function msgHTML(m, i){
+  if (m.kind === 'chips') return m.used ? '' : `<div class="chips">${m.chips.map(c => `<button class="chip ${c.main ? 'main' : ''} ${c.red ? 'red' : ''} ${c.dim ? 'dim' : ''}" data-act="${c.a}" data-label="${esc(c.t)}">${c.ic ? I(c.ic) : ''}${esc(c.t)}</button>`).join('')}</div>`;
+  const side = m.from === 'me' ? 'me' : ''; const av = m.from === 'bot' ? '<div class="av">W</div>' : '';
+  let body = '';
+  if (m.kind === 'typing') body = `<div class="bub"><div class="typing"><i></i><i></i><i></i></div></div>`;
+  else if (m.kind === 'text') body = `<div class="bub">${m.text.map(t => `<p>${esc(t)}</p>`).join('')}</div>`;
+  else if (m.kind === 'img') body = `<div class="bub img"><div class="imgs">${m.urls.map(u => `<img src="${u}" alt="截圖">`).join('')}</div></div>`;
+  else if (m.kind === 'conv'){ const ls = m.text.split('\n').filter(Boolean).slice(0, 5); body = `<div class="bub">${m.label ? `<p>${esc(m.label)}</p>` : ''}<div class="mini">${ls.map(l => `<div>${esc(l)}</div>`).join('')}</div></div>`; }
+  else if (m.kind === 'result'){ const r = m.r, L = LV[r.level];
+    body = `<div class="res ${r.level}"><div class="top">${tl(L.on)}<div><h3>${L.n}<br>${L.a}</h3></div></div><div class="body">${r.type && r.type !== '一般對話' ? `<span class="type">這可能是${esc(r.type)}。</span>` : ''}${esc(r.why)}
+      ${r.names.length ? `<div class="tags">${r.names.map(n => `<span class="tag">${esc(n)}</span>`).join('')}</div>` : ''}<div style="margin-top:8px"><span class="badge ${r.ai ? '' : 'm'}">${r.ai ? 'Claude AI 分析' : !SAMPLE ? '防詐規則判斷' : r.aiFail ? '規則版（AI 暫時無法使用）' : '規則版（範例）'}</span></div></div>
+      ${r.level === 'low' ? '' : `<div class="btns"><button class="btn red" data-act="call" data-label="打電話查證">${I('phone')}先別付款，打電話查證</button></div>`}</div>`; }
+  else if (m.kind === 'why'){ const r = m.r, hits = RULES.filter(x => r.found[x.k]);
+    body = `<div class="bub">${hits.length ? `<p><b>我看到 ${hits.length} 個警訊：</b></p>${hits.map((h, j) => `<p>${j + 1}. <b>${h.name}</b>：${esc(h.tip)}${r.first[h.k] ? `<br><span style="color:var(--mute);font-size:14.5px">「${esc(r.first[h.k].slice(0, 30))}」</span>` : ''}</p>`).join('')}` : '<p>沒有看到常見的詐騙訊號，不過有疑問時，還是可以打電話給本人或官方查證。</p>'}</div>`; }
+  else if (m.kind === 'call') body = `<div class="bub"><p><b>用你自己查到的電話查證，不要用對方給的。</b></p><div class="numcard"><div><span>165 反詐騙專線</span><b>直撥 165</b></div><div><span>你的往來銀行</span><b>銀行官網的客服</b></div><div><span>說是家人朋友</span><b>打他原本的號碼</b></div></div></div>`;
+  else if (m.kind === 'report'){ const R = S.rec, att = attachList();
+    body = `<div class="rep"><h4>${R.who === 'family' ? '關懷通報' : '疑似詐騙通報'}<span class="badge ${R.by === 'ai' ? '' : 'm'}">${R.by === 'ai' ? 'Claude 撰寫' : R.by === 'user' ? '已修改' : '自動帶入'}</span></h4><pre>${esc(R.report)}</pre>
+      <button class="link" data-act="r_edit" data-label="">${I('edit')} 看全文、修改</button>
+      <div class="att">${att.map(x => x.k === 'img' || (x.k === 'up' && x.u) ? `<img src="${x.u}" alt="">` : `<span class="ic">${I(x.k === 'txt' ? 'text' : x.k === 'res' ? 'shield' : 'plus')}</span>`).join('')}<span>附 ${att.length} 項證據</span></div></div>`; }
+  else if (m.kind === 'status'){ const R = S.rec; body = `<div class="stat"><b>案件 ${esc(R.caseNo || '')}</b> · 用時 ${R.secs} 秒<ol>${['示範銀行 A 已受理', '風險複核中', '已提供帳戶保護建議'].map((s, j) => `<li class="${R.status > j ? 'on' : ''}">${s}</li>`).join('')}</ol></div>`; }
+  return `<div class="row ${side}">${av}${body}</div>`;
+}
+const TABS = [['chat', '問 Whoscam', 'chat'], ['family', '家人守護', 'people'], ['learn', '防詐小劇場', 'film']];
+function render(bottom){
+  const act = S.circle.filter(m => m.status === 'active');
+  $('#tabs').innerHTML = TABS.map(t => `<button data-tab="${t[0]}" ${S.tab === t[0] ? 'aria-current="page"' : ''}>${I(t[2])}${t[1]}</button>`).join('');
+  if (S.tab === 'chat'){
+    $('#head').innerHTML = `<div class="logo">W</div><div class="t"><b>Whoscam 小幫手</b><span class="${S.paused || !act.length ? 'off' : ''}"><i></i>${S.paused ? '守護圈暫停中' : act.length ? '守護中 · ' + esc(act.map(m => m.name).join('、')) : '尚未邀請家人'}</span></div><button class="sosbtn" data-act="sos" data-label="我可能被騙了">${I('sos')}我被騙了</button>`;
+    $('#view').className = 'view chatv'; $('#view').innerHTML = S.msgs.map(msgHTML).join('');
+    $('#compose').innerHTML = `<div class="compose"><button class="circ" data-act="shot" data-label="" aria-label="傳截圖">${I('img')}</button><textarea id="msg" rows="1" placeholder="${S.flow === 'amount' ? '輸入金額，例如 50000' : S.flow === 'note' ? '用一句話描述家人的狀況' : '貼上訊息或描述狀況'}" aria-label="訊息"></textarea>${DICT ? `<button class="circ ${S.listening ? 'rec' : ''}" id="micbtn" aria-label="用說的">${I('mic')}</button>` : ''}<button class="circ send" id="sendbtn" aria-label="送出">${I('send')}</button></div>`;
+    $('#sendbtn').onclick = onSend; $('#msg').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); onSend(); } };
+    $('#msg').oninput = e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px'; };
+    const mb = $('#micbtn'); if (mb) mb.onclick = startDictation;
+    requestAnimationFrame(() => { const v = $('#view'); v.scrollTop = v.scrollHeight; });
+  } else {
+    $('#compose').innerHTML = '';
+    const V = S.page === 'video' ? VIDEO : S.tab === 'family' ? FAMILY : LEARN;
+    $('#head').innerHTML = `${S.page ? `<button class="iconbtn" id="back" aria-label="返回">${I('back')}</button>` : ''}<div class="t"><b style="font-size:19px">${V.title()}</b></div><span class="badge" style="font-size:14px;padding:4px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</span>`;
+    $('#view').className = 'view pagev'; $('#view').innerHTML = V.html(); V.after && V.after();
+    const b = $('#back'); if (b) b.onclick = () => { if (S.timer){ clearInterval(S.timer); S.timer = null; } S.page = null; render(); };
+    if (bottom !== false) $('#view').scrollTop = 0;
+  }
+}
+
+const FAMILY = {title:() => '家人守護圈', html:() => {
+  const slots = [0, 1, 2].map(i => { const m = S.circle[i]; return m ? `<button class="slot" data-mem="${m.id}"><span class="face" style="background:${COLORS[m.c]}">${esc(m.name.slice(-1))}<span class="st ${m.status === 'pending' ? 'wait' : ''}"></span></span><b>${esc(m.name)}</b><span>${m.status === 'pending' ? '等待同意' : esc(m.rel)}</span></button>` : `<button class="slot" data-add><span class="face empty">${I('plus', 'style="width:30px;height:30px"')}</span><b>邀請</b><span>空位</span></button>`; }).join('');
+  return `<h2 class="hi">出事時，讓家人知道</h2><p class="lede">最多 3 位。他們只會收到「你需要幫忙」，看不到你的對話。</p><div class="faces">${slots}</div>
+  ${S.circle.some(m => m.status === 'pending') ? `<button class="btn soft" id="sim">模擬：對方在手機上按「同意」</button>` : ''}
+  <div class="sec"><h3>什麼時候通知</h3></div><div class="card" style="padding-top:2px;padding-bottom:2px">${[['high', '檢查結果是高風險'], ['recover', '我按下「我被騙了」'], ['ask', '我按「請家人幫我看」']].map(t => `<label class="sw">${t[1]}<input type="checkbox" role="switch" data-trig="${t[0]}" ${S.trig[t[0]] ? 'checked' : ''}></label>`).join('')}<label class="sw">通知附上警訊名稱<input type="checkbox" role="switch" id="share" ${S.share ? 'checked' : ''}></label></div>
+  <div class="sec"><h3>他們會收到</h3></div><div class="pv"><span class="logo">W</span><div><b>Whoscam 守護圈</b><div>你關心的家人剛遇到疑似假投資${S.share ? '（保證獲利、要你保密）' : ''}，打個電話問候吧。</div></div></div>
+  <div class="sec"><h3>家人能做什麼</h3></div><div class="cando card"><div><b>可以</b><ul><li><span class="y">✓</span> 打電話關心</li><li><span class="y">✓</span> 替你送出求助</li></ul></div><div><b>不可以</b><ul><li><span class="n">✕</span> 看你的帳戶</li><li><span class="n">✕</span> 凍結交易</li><li><span class="n">✕</span> 讀你的對話</li></ul></div></div>
+  <button class="btn plain" id="pause">${S.paused ? '恢復守護' : '暫停通知 24 小時'}</button>
+  <div class="card" style="margin-top:12px"><b>也到銀行設定「指定聯絡人」</b><div class="lede" style="margin:4px 0 0;font-size:14.5px">已有 24 家銀行開辦：解定存或大額匯款時，銀行會通知你指定的家人。</div></div>
+  <div class="card"><b>通知紀錄（只有你看得到）</b>${S.log.map(l => `<div class="lede" style="margin:4px 0 0;font-size:14px">${l.t}　${esc(l.to)}：${esc(l.reason)}</div>`).join('') || '<div class="lede" style="margin:4px 0 0;font-size:14px">還沒有通知</div>'}</div>`; },
+  after:() => {
+    $$('[data-add]').forEach(b => b.onclick = () => { sheet(`<h3>邀請家人加入</h3><p class="lede">對方按「同意」後才開始守護。</p><input type="text" id="nm" placeholder="怎麼稱呼？例如：媽媽" maxlength="8"><div class="rels">${['母親', '父親', '子女', '配偶', '兄弟姊妹', '朋友'].map(r => `<button data-rel="${r}" aria-pressed="${S.invRel === r}">${r}</button>`).join('')}</div><button class="btn" id="send" style="margin-top:16px">傳送邀請</button>`);
+      $$('[data-rel]').forEach(x => x.onclick = () => { S.invRel = x.dataset.rel; $$('[data-rel]').forEach(y => y.setAttribute('aria-pressed', y === x)); });
+      $('#send').onclick = () => { const n = $('#nm').value.trim(); if (!n){ toast('請輸入稱呼'); return; } S.circle.push({id:Date.now(), name:n, rel:S.invRel, status:'pending', c:[0, 1, 2, 3].find(i => !S.circle.some(m => m.c === i))}); closeSheet(); toast(`已傳送邀請給 ${n}`); render(); }; setTimeout(() => $('#nm') && $('#nm').focus(), 250); });
+    const sim = $('#sim'); if (sim) sim.onclick = () => { const m = S.circle.find(x => x.status === 'pending'); m.status = 'active'; S.accepted = true; notify(`${m.name} 已加入守護圈`, '之後遇到高風險時，他會收到通知。'); render(); };
+    $$('[data-mem]').forEach(b => b.onclick = () => { const m = S.circle.find(x => x.id == b.dataset.mem); sheet(`<h3>${esc(m.name)}（${esc(m.rel)}）</h3><p class="lede">${m.status === 'pending' ? '還在等對方同意。' : '已同意，高風險時會收到通知。'}</p><button class="btn red" id="rm">移出守護圈</button><button class="btn plain" data-close style="margin-top:10px">取消</button>`);
+      $('#rm').onclick = () => { S.circle = S.circle.filter(x => x !== m); closeSheet(); toast(`已移除 ${m.name}`); if (S.accepted) tick('t2'); render(); }; });
+    $$('[data-trig]').forEach(c => c.onchange = () => { S.trig[c.dataset.trig] = c.checked; });
+    $('#share').onchange = e => { S.share = e.target.checked; render(); };
+    $('#pause').onclick = () => { S.paused = !S.paused; if (S.paused && S.accepted) tick('t2'); toast(S.paused ? '已暫停 24 小時' : '已恢復守護'); render(); };
+  }};
+
+const LEARN = {title:() => '防詐小劇場', html:() => { const nextR = SHOP.filter(r => r.p > S.pts).sort((a, b) => a.p - b.p)[0];
+  return `<div class="pts"><div style="font-size:14px;opacity:.85">我的點數</div><div class="n">${S.pts}</div><div class="meter"><i style="width:${Math.min(100, S.today / 60 * 100)}%"></i></div><div style="font-size:13.5px;opacity:.9">今天 ${S.today}/60 點 · ${nextR ? `再 ${nextR.p - S.pts} 點可換${esc(nextR.n)}` : '可以兌換所有好禮了'}</div></div>
+  <div class="sec"><h3>60 秒看懂一種詐騙</h3><span class="lede" style="margin:0;font-size:13.5px">看完答對 +30 點</span></div>
+  <div class="reel">${VIDEOS.map(v => `<button class="rv" data-vid="${v.id}"><img src="videos/${v.id}.jpg" alt=""><span class="play">${I('play')}</span>${S.done[v.id] ? '<span class="vok">已完成</span>' : ''}<b>${v.t}</b><span>${v.s}</span></button>`).join('')}</div>
+  <div class="sec"><h3>兌換好禮</h3><span class="lede" style="margin:0;font-size:13.5px">示範商家</span></div>
+  <div class="card" style="padding-top:2px;padding-bottom:2px">${SHOP.map(r => `<div class="rw"><span><b>${r.n}</b><span>${r.p} 點</span></span><button class="btn soft small" data-buy="${r.id}" ${S.pts < r.p ? 'disabled' : ''}>兌換</button></div>`).join('')}</div>
+  ${S.codes.length ? `<div class="card"><b>我的兌換券</b>${S.codes.map(c => `<div style="font-size:14px">${esc(c)}</div>`).join('')}</div>` : ''}<p class="lede" style="font-size:13px">點數不可轉讓、不可換現金，有效期 12 個月。</p>`; },
+  after:() => { $$('[data-vid]').forEach(b => b.onclick = () => { S.vid = b.dataset.vid; S.prog = S.done[S.vid] ? 100 : 0; S.q = 0; S.pick = null; S.right = 0; S.page = 'video'; render(); });
+    $$('[data-buy]').forEach(b => b.onclick = () => { const r = SHOP.find(x => x.id === b.dataset.buy); if (S.pts < r.p) return; S.pts -= r.p; S.codes.push(`${r.n}：WC-${Math.random().toString(36).slice(2, 8).toUpperCase()}`); toast('兌換成功'); render(); }); }};
+
+const VIDEO = {title:() => VIDEOS.find(x => x.id === S.vid).s, html:() => { const v = VIDEOS.find(x => x.id === S.vid);
+  if (S.prog < 100) return `<div class="vp"><video id="vp" src="videos/${v.id}.mp4" poster="videos/${v.id}.jpg" controls playsinline preload="metadata"></video></div><div class="prog"><i id="pbar" style="width:${S.prog}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px"><span class="lede" style="font-size:13.5px;margin:0">看完就開放 3 題測驗</span><button class="link" id="skip" style="font-size:13px;color:var(--mute)">測試用：跳到測驗</button></div>`;
+  if (S.q >= 3){ const all = S.right === 3; return `<div style="text-align:center;padding:30px 0"><div style="width:84px;height:84px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:${all ? 'var(--greensoft)' : 'var(--ambersoft)'};color:${all ? 'var(--green)' : 'var(--amber)'}">${I(all ? 'check' : 'speak', 'style="width:42px;height:42px"')}</div><h2 class="hi">${all ? (S.gain ? `全對！+${S.gain} 點` : '全對！') : `答對 ${S.right}/3 題`}</h2><p class="lede">${all ? (S.gain ? '點數已存入，可以去兌換好禮。' : '這部的點數已經領過，或今天已達上限。') : '全對才有點數，明天再試試。'}</p><button class="btn" id="tolearn">回到小劇場</button></div>`; }
+  const q = v.qs[S.q], done = S.pick !== null;
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px"><b>小測驗</b><div class="dots">${[0, 1, 2].map(i => `<i class="${i <= S.q ? 'on' : ''}"></i>`).join('')}</div></div><p style="font-size:19px;font-weight:700;line-height:1.4">${q[0]}</p>
+  ${q[1].map((o, j) => `<button class="ans ${done ? (j === q[2] ? 'right' : j === S.pick ? 'wrong' : '') : ''}" data-ans="${j}" ${done ? 'disabled' : ''}>${o}</button>`).join('')}
+  ${done ? `<div class="card" style="background:${S.pick === q[2] ? 'var(--greensoft)' : 'var(--redsoft)'}"><b>${S.pick === q[2] ? '答對了' : '再想想'}</b>　${q[3]}</div><button class="btn" id="nextq">${S.q < 2 ? '下一題' : '看結果'}</button>` : ''}`; },
+  after:() => { const v = VIDEOS.find(x => x.id === S.vid);
+    const vp = $('#vp'); if (vp){ vp.ontimeupdate = () => { if (!vp.duration) return; S.prog = Math.max(S.prog, vp.currentTime / vp.duration * 100); const pb = $('#pbar'); if (pb) pb.style.width = S.prog + '%'; if (vp.currentTime >= vp.duration - 1.2 && S.page === 'video'){ S.prog = 100; vp.ontimeupdate = null; render(); } }; vp.onended = () => { S.prog = 100; render(); }; }
+    const sk = $('#skip'); if (sk) sk.onclick = () => { S.prog = 100; render(); };
+    $$('[data-ans]').forEach(b => b.onclick = () => { S.pick = +b.dataset.ans; if (S.pick === v.qs[S.q][2]) S.right++; render(); });
+    const n = $('#nextq'); if (n) n.onclick = () => { S.q++; S.pick = null; S.gain = 0; if (S.q >= 3 && S.right === 3 && !S.done[v.id]){ S.gain = Math.min(30, 60 - S.today); S.done[v.id] = true; S.pts += S.gain; S.today += S.gain; tick('t4'); } render(); };
+    const t = $('#tolearn'); if (t) t.onclick = () => { S.page = null; render(); }; }};
+
+function fullSheet(){ const r = S.result; if (!r) return;
+  sheet(`<h3>整段對話標示</h3><p class="lede">紅色是有警訊的訊息。</p><div class="full">${r.lines.map(o => o.who === undefined ? `<div class="lede" style="text-align:center;margin:8px 0 2px;font-size:13px">${esc(o.day)}</div>` : `<div class="b ${o.hits.length ? 'hit' : ''}">${o.who ? `<small>${esc(o.who)}</small>` : ''}${esc(o.text)}${o.hits.length ? `<small><em>${o.hits.map(k => RULES.find(x => x.k === k).name).join('、')}</em></small>` : ''}</div>`).join('')}</div><button class="btn plain" data-close style="margin-top:12px">關閉</button>`); }
+function renderTasks(){ $('#tasks').innerHTML = TASKS.map(t => `<div class="task ${S.tasks[t[0]] ? 'ok' : ''}"><div class="tick">${S.tasks[t[0]] ? I('check', 'style="width:18px;height:18px;stroke-width:3"') : ''}</div><div><b>${t[1]}</b><span>${t[2]}${t[0] === 't3' && S.rec && S.rec.secs ? `（上次 ${S.rec.secs} 秒）` : ''}</span></div></div>`).join(''); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]'); if (t){ S.tab = t.dataset.tab; S.page = null; render(); return; }
+  const a = e.target.closest('[data-act]'); if (a){ S._chipLabel = a.dataset.label || ''; act(a.dataset.act); S._chipLabel = ''; return; }
+  if (e.target.closest('[data-close]') || e.target.id === 'overlay') closeSheet();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+$('#shotin').onchange = e => { const f = [...e.target.files].slice(0, 10); e.target.value = ''; if (f.length){ S.tab = 'chat'; S.flow = null; handleShots(f); } };
+$('#morein').onchange = e => { [...e.target.files].slice(0, 6).forEach(f => S.rec.extra.push({k:'up', u:f.type.startsWith('image/') ? URL.createObjectURL(f) : '', n:f.name.slice(0, 30)})); e.target.value = ''; toast('已加入證據'); render(); };
+$('#reset').onclick = () => { if (S.timer) clearInterval(S.timer); closeSheet(); S = fresh(); greet(); render(); renderTasks(); toast('已重新開始'); };
+greet(); render(); renderTasks();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
