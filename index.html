@@ -143,6 +143,26 @@ a.btn{text-decoration:none;margin-top:10px}
 .codein{text-align:center;font:800 28px Inter,ui-monospace,monospace!important;letter-spacing:.12em;text-transform:uppercase}
 .todo{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15.5px}
 button.alr{display:block;width:100%;text-align:left;border:0;color:var(--ink)}
+.rvname{display:grid;gap:4px;margin:0 0 10px;font-size:14px;color:var(--mute)}.rvname input{width:100%}
+#rvlist{display:grid;gap:8px;margin-bottom:6px}
+.rvrow{display:grid;grid-template-columns:54px 1fr 36px;gap:6px;align-items:start;border:1.5px solid var(--line);border-radius:14px;padding:6px;background:var(--bg)}
+.rvrow.low{border-color:var(--amber);background:var(--ambersoft)}
+.sheet .rvrow textarea{border:0;border-radius:0;background:none;resize:none;font-size:16px;line-height:1.45;padding:6px 2px;min-height:34px;overflow:hidden;color:var(--ink);width:100%}
+.rvrow textarea:focus{outline:none}.rvrow:focus-within{border-color:var(--brand)}
+.rvwho{border:0;border-radius:10px;min-height:36px;font-weight:800;font-size:14px;background:var(--sub);color:var(--ink)}
+.rvrow.me .rvwho{background:var(--fill);color:#fff}
+.rvdel{border:0;background:none;width:36px;height:36px;border-radius:10px;color:var(--mute);display:grid;place-items:center}.rvdel svg{width:18px;height:18px}
+.facts{display:grid;gap:4px;margin:10px 0 2px;border-top:1px dashed var(--line);padding-top:8px}
+.facts div{display:grid;grid-template-columns:62px 1fr;gap:8px;font-size:14px;align-items:baseline}.facts span{color:var(--mute)}.facts b{font-weight:700}
+.facts.big{margin:0;border:1px solid var(--line);padding:12px 14px;gap:8px}.facts.big div{grid-template-columns:76px 1fr;font-size:15.5px}
+.cv{display:grid;gap:8px;padding:12px}
+.cvsrc{font-size:13px;color:var(--mute);background:var(--sub);border-radius:10px;padding:6px 10px}
+.cvday{text-align:center;font-size:12.5px;color:var(--mute);margin:4px 0}
+.cvm{max-width:84%;justify-self:start;background:var(--sub);border-radius:6px 16px 16px 16px;padding:7px 12px;font-size:15.5px;line-height:1.5}
+.cvm.me{justify-self:end;background:var(--brandsoft);border-radius:16px 6px 16px 16px}
+.cvm small{display:block;font-size:12px;color:var(--mute);font-weight:700}
+.cvm.hit{background:var(--redsoft);box-shadow:inset 0 0 0 1.5px var(--red)}
+.cvm em{display:block;font-style:normal;font-size:12.5px;color:var(--red);font-weight:800;margin-top:2px}
 .mini{background:var(--chat);border-radius:14px;padding:8px;margin-top:6px;max-height:150px;overflow:hidden;position:relative;font-size:13.5px}
 .mini::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--chat))}
 .me .mini{background:#ffffff26;color:#fff}.me .mini::after{background:none}
@@ -362,13 +382,88 @@ function webDict(){ const R = window.SpeechRecognition || window.webkitSpeechRec
       rec.onstart = () => cb.s && cb.s({state:'listening'}); rec.onend = () => cb.s && cb.s({state:'idle'}); rec.onerror = () => cb.s && cb.s({state:'idle'});
       rec.start(); return Promise.resolve(); },
     stop(){ if (rec) rec.stop(); return Promise.resolve(); }}; }
-let TESS = null;
-function loadTess(){ return TESS || (TESS = new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; s.onload = () => res(window.Tesseract); s.onerror = () => { TESS = null; rej({code:'offline'}); }; document.head.appendChild(s); })); }
-async function localOCR(files){ const T = await loadTess(); const w = await T.createWorker('chi_tra'); const out = [];
-  try { for (const f of files){ const {data} = await w.recognize(await shrink(f)); out.push(...String(data.text || '').split(/\n+/)); } } finally { w.terminate(); }
-  const lines = out.map(l => l.replace(/(?<=[\u3400-\u9fff\uff00-\uffef])\s+(?=[\u3400-\u9fff\uff00-\uffef0-9])/g, '').replace(/(?<=[0-9])\s+(?=[\u3400-\u9fff])/g, '').trim())
-    .filter(l => l.length >= 2 && !/^(上午|下午)?\s*\d{1,2}[:：]\d{2}$/.test(l) && !/^已讀/.test(l) && /[\u3400-\u9fff]/.test(l));
-  if (!lines.length) throw {code:'empty'}; return lines.join('\n'); }
+const TESS_V = '5.1.1';
+let TESS = null, OCRW = null;
+function loadTess(){ return TESS || (TESS = new Promise((res, rej) => { const s = document.createElement('script'); s.src = `https://cdn.jsdelivr.net/npm/tesseract.js@${TESS_V}/dist/tesseract.min.js`; s.onload = () => res(window.Tesseract); s.onerror = () => { TESS = null; rej({code:'offline'}); }; document.head.appendChild(s); })); }
+function ocrWorker(){ return OCRW || (OCRW = loadTess().then(T => T.createWorker('chi_tra+eng', 1)).catch(e => { OCRW = null; throw e && e.code ? e : {code:'offline'}; })); }
+const PUN = {',':'，', '!':'！', '?':'？', ':':'：', ';':'；'};
+const CJ = '\\u3400-\\u9fff\\uff00-\\uffef，。！？、；：「」『』（）';
+const ocrClean = t => String(t || '').replace(/\n+/g, ' ').replace(new RegExp(`(?<=[${CJ}])\\s+(?=[${CJ}0-9A-Za-z])|(?<=[0-9A-Za-z])\\s+(?=[${CJ}])`, 'g'), '').replace(/\s{2,}/g, ' ').replace(/﹖/g, '？').replace(/﹗/g, '！').replace(/﹐/g, '，').replace(/﹕/g, '：')
+  .replace(new RegExp(`\\s*([,!?:;])\\s*(?=[${CJ}]|$)`, 'g'), (m, p) => PUN[p]).replace(new RegExp(`(?<=[${CJ}])\\s*([,!?:;])`, 'g'), (m, p) => PUN[p])
+  .replace(/^[^\u3400-\u9fffA-Za-z0-9「『（(]{1,3}\s+/, '').replace(/^[^\u3400-\u9fffA-Za-z0-9「『（(]+(?=[\u3400-\u9fff])/, '').replace(/\s+[^\u3400-\u9fffA-Za-z0-9。！？」』）)~～]{1,3}$/, '').trim();
+// find chat bubbles: filled regions whose colour differs from the chat background
+function findBubbles(bmp){
+  const W0 = bmp.width, H0 = bmp.height, s = Math.min(1, 400 / W0), w = Math.max(1, Math.round(W0 * s)), h = Math.max(1, Math.round(H0 * s));
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d', {willReadFrequently:true}); g.drawImage(bmp, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data, px = (x, y) => (y * w + x) * 4;
+  const sam = [[], [], []]; for (let y = Math.round(h * 0.15); y < h * 0.85; y += 2) for (const x of [2, 3, w - 3, w - 4]){ const i = px(x, y); sam[0].push(d[i]); sam[1].push(d[i + 1]); sam[2].push(d[i + 2]); }
+  const bg = sam.map(a => a.sort((p, q) => p - q)[a.length >> 1]);
+  const mask = new Uint8Array(w * h); for (let k = 0; k < w * h; k++){ const i = k * 4; mask[k] = Math.max(Math.abs(d[i] - bg[0]), Math.abs(d[i + 1] - bg[1]), Math.abs(d[i + 2] - bg[2])) > 26 ? 1 : 0; }
+  const lab = new Int32Array(w * h), comps = [], st = new Int32Array(w * h);
+  for (let k = 0; k < w * h; k++){ if (!mask[k] || lab[k]) continue; let n = 0, top = 0; st[top++] = k; lab[k] = comps.length + 1; let x0 = w, x1 = 0, y0 = h, y1 = 0;
+    while (top){ const q = st[--top], x = q % w, y = (q / w) | 0; n++; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (const r of [q - 1, q + 1, q - w, q + w]){ if (r < 0 || r >= w * h || lab[r] || !mask[r]) continue; if ((r === q - 1 && x === 0) || (r === q + 1 && x === w - 1)) continue; lab[r] = comps.length + 1; st[top++] = r; } }
+    comps.push({x0, x1, y0, y1, n, bw:x1 - x0 + 1, bh:y1 - y0 + 1}); }
+  const bars = comps.filter(o => o.bw > w * 0.9);
+  const head = bars.find(o => o.y0 <= 2 && o.bh < h * 0.2), foot = bars.find(o => o.y1 >= h - 3 && o.bh < h * 0.2);
+  const out = [];
+  for (const o of comps){
+    const fill = o.n / (o.bw * o.bh);
+    if (o.bw > w * 0.9 || o.bw < 22 || o.bh < 16 || fill < 0.55) continue;
+    if (head && o.y1 <= head.y1) continue; if (foot && o.y0 >= foot.y0) continue;
+    if (o.bw < 52 && o.bh < 52 && Math.abs(o.bw - o.bh) <= 7 && o.x0 < w * 0.18) continue; // avatar
+    const cx = (o.x0 + o.x1) / 2, center = Math.abs(cx - w / 2) < w * 0.07 && o.bw < w * 0.45 && o.bh < 34;
+    out.push({x:o.x0 / s, y:o.y0 / s, w:o.bw / s, h:o.bh / s, side:center ? 'day' : (w - 1 - o.x1) < o.x0 ? 'me' : 'them'});
+  }
+  out.sort((a, b) => a.y - b.y || a.x - b.x);
+  return {bubbles:out, head:head ? {y0:0, y1:head.y1 / s} : null, W:W0, H:H0, bg};
+}
+function cropFor(bmp, x, y, cw, ch, inset, bg, ix){
+  ix = ix == null ? inset : ix; x = Math.max(0, x + ix); y = Math.max(0, y + inset); cw = Math.min(bmp.width - x, cw - ix * 2); ch = Math.min(bmp.height - y, ch - inset * 2);
+  const k = ch < 90 ? 2 : 1, c = document.createElement('canvas'); c.width = Math.max(1, Math.round(cw * k)); c.height = Math.max(1, Math.round(ch * k));
+  const g = c.getContext('2d', {willReadFrequently:true}); g.imageSmoothingQuality = 'high'; g.drawImage(bmp, x, y, cw, ch, 0, 0, c.width, c.height);
+  const im = g.getImageData(0, 0, c.width, c.height), d = im.data, L = new Float32Array(d.length / 4); let sum = 0;
+  const isBg = new Uint8Array(L.length); let nb = 0;
+  for (let i = 0; i < L.length; i++){ L[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+    if (bg && Math.max(Math.abs(d[i * 4] - bg[0]), Math.abs(d[i * 4 + 1] - bg[1]), Math.abs(d[i * 4 + 2] - bg[2])) < 30) isBg[i] = 1; else { sum += L[i]; nb++; } }
+  if (bg){ // keep only background that touches the crop edge (rounded corners, tails), not dark text inside the bubble
+    const cw2 = c.width, ch2 = c.height, keep = new Uint8Array(L.length), stk = [];
+    for (let x = 0; x < cw2; x++){ stk.push(x, (ch2 - 1) * cw2 + x); } for (let y = 0; y < ch2; y++){ stk.push(y * cw2, y * cw2 + cw2 - 1); }
+    while (stk.length){ const q = stk.pop(); if (keep[q] || !isBg[q]) continue; keep[q] = 1; const x = q % cw2;
+      if (x > 0) stk.push(q - 1); if (x < cw2 - 1) stk.push(q + 1); if (q >= cw2) stk.push(q - cw2); if (q + cw2 < L.length) stk.push(q + cw2); }
+    sum = 0; nb = 0; for (let i = 0; i < L.length; i++){ isBg[i] = keep[i]; if (!keep[i]){ sum += L[i]; nb++; } } }
+  const mean = sum / Math.max(1, nb), inv = mean < 128; const sorted = Float32Array.from(L).sort(); let lo = sorted[Math.floor(L.length * 0.005)], hi = sorted[Math.floor(L.length * 0.995)];
+  if (hi - lo < 60){ lo = sorted[0]; hi = sorted[L.length - 1]; } const span = Math.max(40, hi - lo);
+  for (let i = 0; i < L.length; i++){ let v = Math.max(0, Math.min(255, (L[i] - lo) / span * 255)); if (inv) v = 255 - v; if (isBg[i]) v = 255; d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v; d[i * 4 + 3] = 255; }
+  g.putImageData(im, 0, 0); return c;
+}
+const isDay = t => /^(今天|昨天|前天|星期.|週.|\d{1,4}[\/.]\d{1,2}([\/.]\d{1,2})?(\([^)]*\))?|\d{1,2}月\d{1,2}日.*)$/.test(t);
+// returns {name, items:[{who:'me'|'them', text, low}] } ; progress(i, n)
+async function localOCR(files, progress){
+  const w = await ocrWorker(); let name = ''; const items = [];
+  for (const f of files){
+    const bmp = await createImageBitmap(f); const seg = findBubbles(bmp);
+    if (!name && seg.head && seg.head.y1 > 40){ const hy = seg.head.y1 * 0.42, hh = seg.head.y1 - hy;
+      await w.setParameters({tessedit_pageseg_mode:'7'}); const r = await w.recognize(cropFor(bmp, 0, hy, bmp.width, hh, 2));
+      const t = ocrClean(r.data.text).replace(/^[^㐀-鿿A-Za-z0-9]+/, '').replace(/[\s(（]*\d+[)）]?$/, '').replace(/[^㐀-鿿A-Za-z0-9 ]+$/, '').trim();
+      if (t && t.length <= 12 && !/\d{1,2}[:：]\d{2}|%/.test(t) && r.data.confidence > 55) name = t; }
+    if (seg.bubbles.length){
+      const minH = Math.min(...seg.bubbles.filter(b => b.side !== 'day').map(b => b.h));
+      for (let i = 0; i < seg.bubbles.length; i++){ const b = seg.bubbles[i]; if (progress) progress(items.length + 1, null);
+        await w.setParameters({tessedit_pageseg_mode:b.h < minH * 1.5 ? '7' : '6'});
+        const r = await w.recognize(cropFor(bmp, b.x, b.y, b.w, b.h, Math.max(2, Math.round(Math.min(b.h, 140) * 0.06)), seg.bg, Math.max(3, Math.round(Math.min(b.h, 140) * 0.12)))); const t = ocrClean(r.data.text);
+        if (!t || (t.match(/[㐀-鿿A-Za-z0-9]/g) || []).length < 1) continue;
+        if (b.side === 'day'){ if (isDay(t)) items.push({day:t}); continue; }
+        items.push({who:b.side, text:t, low:r.data.confidence < 72}); }
+    } else {
+      await w.setParameters({tessedit_pageseg_mode:'3'}); const r = await w.recognize(cropFor(bmp, 0, 0, bmp.width, bmp.height, 0));
+      String(r.data.text).split(/\n+/).map(ocrClean).filter(t => t.length >= 2 && /[㐀-鿿]/.test(t) && !/^((上午|下午)\s*)?\d{1,2}[:：]\d{2}$|^已讀/.test(t)).forEach(t => items.push({who:'them', text:t, low:true}));
+    }
+    bmp.close && bmp.close();
+  }
+  if (!items.some(x => x.text)) throw {code:'empty'};
+  return {name, items};
+}
 (async () => { if (!(window.claude && window.claude.use)){ TTS = webTTS(); DICT = webDict(); return; } try { if (window.claude && window.claude.use){ [SAMPLE, TTS, DICT] = await Promise.all([window.claude.use('sample'), window.claude.use('tts'), window.claude.use('dictation')]); render(); } } catch (e) {} })();
 
 // ---------- analysis ----------
@@ -389,6 +484,20 @@ function analyse(raw){
   const why = level === 'high' ? (found.profit ? '保證獲利、限時入金又要你保密，這是假投資最常見的組合。' : found.authority ? '真正的檢警不會要你交錢監管，也不會要你對家人保密。' : found.imperson ? '自稱老朋友、突然急著借錢又要你保密，先打給本人確認。' : '對方一直催你付款，又不讓你查證。') : level === 'mid' ? '不一定是詐騙，但已經值得停下來，用官方管道查一下。' : names.length ? '有提到轉帳，但沒有催促或保密，像一般對話。' : '沒有發現常見的詐騙訊號。';
   return {level, found, first, names, why, type, lines:out, ai:false};
 }
+function facts(r){
+  const all = r.lines.filter(l => l.who !== undefined), them = all.filter(l => l.who !== '我'), base = them.length ? them : all, txt = base.map(l => l.text).join('\n'), F = [];
+  const nm = them.map(l => l.who).find(w => w && w !== '對方' && w !== '（描述）');
+  const claim = txt.match(/(?:我是|自稱|這裡是)([^，。！？\s]{1,10})/) || txt.match(/(老朋友|老同學|檢察官|警察|地檢署|法院|客服|銀行專員|投資老師|老師|助理|主管)/);
+  const cl = claim ? (claim[1] || claim[0]) : ''; if (nm || cl) F.push(['對方', [nm, cl && cl !== nm ? `自稱${cl}` : ''].filter(Boolean).join('，')]);
+  const asks = []; [[/借/, '借錢'], [/(匯款|轉帳|轉給|轉我|一筆轉|網銀)/, '轉帳或匯款'], [/(入金|儲值)/, '入金'], [/ATM/i, '去 ATM 操作'], [/(提現金|領現金|提領|給你現金|面交)/, '給現金'], [/點數/, '買點數'], [/(驗證碼|OTP|密碼)/i, '給驗證碼或密碼'], [/(加.{0,3}LINE|私訊|加好友)/i, '加 LINE 或私訊'], [/(下載|安裝).{0,6}(App|APP|程式)/, '下載 App'], [/(監管|交給.{0,4}保管)/, '把錢交給他監管']]
+    .forEach(([re, s]) => { if (re.test(txt)) asks.push(s); }); if (asks.length) F.push(['要求', asks.join('、')]);
+  const amts = [...new Set((txt.match(/\d[\d,]*(?:\.\d+)?\s*(?:萬|千|元|塊)|[一二三四五六七八九十兩百千]+萬|NT\$?\s?\d[\d,]*/g) || []).map(s => s.replace(/\s/g, '')))]; if (amts.length) F.push(['金額', amts.slice(0, 3).join('、')]);
+  const dl = txt.match(/(\d+\s*分鐘內|\d{1,2}\s*點前|今[天晚][^，。！？\n]{0,5}前|[上下]午前|晚上前|馬上|立刻|現在就)/) || txt.match(/(今天|今晚)/); if (dl) F.push(['期限', dl[0]]);
+  const ac = (r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/) || [])[0]; if (ac) F.push(['帳號', ac]);
+  if (r.found.link) F.push(['連結', '有陌生連結，不要點']);
+  return F;
+}
+const SRC = {shot:'截圖辨識，本人已確認', 'shot-ai':'截圖由 AI 辨識', paste:'本人貼上的文字', example:'範例對話'};
 const maskText = t => t.replace(/\b(\d{3})[-\s]?\d{3,4}[-\s]?\d{3,4}[-\s]?(\d{2,4})\b/g, '$1-****-****-$2').replace(/[A-Z][12]\d{8}/g, m => m[0] + '*******' + m.slice(-2)).replace(/(09\d{2})-?\d{3}-?(\d{3})/g, '$1-***-$2');
 async function askJSON(prompt, opts){
   try { const v = await SAMPLE.json(prompt, opts); if (v && typeof v === 'object') return v; } catch (e) { if (e && (e.code === 'not_granted' || e.code === 'rate_limited')) throw e; }
@@ -400,7 +509,7 @@ const OCR_PROMPT = `你是聊天截圖的文字辨識工具。依照圖片順序
 規則：右側的對話泡泡（LINE 通常是綠色）是使用者本人，who 填「我」；左側是對方，看得到名稱就用名稱，看不到就填「對方」。日期分隔列輸出為 {"type":"day","text":"..."}。忽略時間、已讀、輸入框、系統提示；照片、貼圖、語音寫成「[圖片]」「[貼圖]」「[語音]」。文字照原樣，不要改寫。
 只輸出 JSON：{"items":[{"type":"msg","who":"我","text":"..."}]}`;
 async function ocr(files){
-  if (!SAMPLE) return localOCR(files); const lim = await SAMPLE.limits(); if (!lim || !lim.images) throw {code:'no_images'};
+  if (!SAMPLE) throw {code:'unavailable'}; const lim = await SAMPLE.limits(); if (!lim || !lim.images) throw {code:'no_images'};
   const out = await askJSON(OCR_PROMPT, {images:await Promise.all(files.map(shrink)), modelTier:'default'});
   const lines = (Array.isArray(out.items) ? out.items : []).map(it => it && it.type === 'day' ? `【${String(it.text || '').slice(0, 20)}】` : (it && it.text ? `${String(it.who || '對方').replace(/[：:\n]/g, '').slice(0, 10) || '對方'}：${String(it.text).replace(/\n/g, ' ')}` : '')).filter(Boolean);
   if (!lines.some(l => !l.startsWith('【'))) throw {code:'empty'}; return lines.join('\n');
@@ -431,11 +540,11 @@ function greet(){
   bot({kind:'text', text:['嗨，我是 Whoscam 防詐小幫手。', '收到怪怪的訊息嗎？選一個開始，30 秒告訴你風險和下一步。']});
   S.msgs.push({from:'bot', kind:'start'});
 }
-async function analyseText(text, scen, label, shots, noEcho){
+async function analyseText(text, scen, label, shots, noEcho, src){
   S.flow = null; if (!noEcho){ if (shots && shots.length) me({kind:'img', urls:shots}); else me({kind:'conv', label, text}); }
   typing(); const t0 = Date.now(); let r;
   if (scen) r = analyse(maskText(text)); else { try { r = await aiAnalyse(maskText(text)); } catch (e) { r = analyse(maskText(text)); r.aiFail = true; } }
-  r.text = text; r.scen = scen; S.result = r; await wait(Math.max(0, 1300 - (Date.now() - t0)));
+  r.text = text; r.scen = scen; r.src = src || (scen ? 'example' : 'paste'); r.facts = facts(r); S.result = r; await wait(Math.max(0, 1300 - (Date.now() - t0)));
   untype(); bot({kind:'result', r});
   const list = r.level === 'low' ? [{t:'再檢查另一段', a:'shot', ic:'img'}, {t:'為什麼這樣判斷？', a:'why'}] :
     [{t:'我已經匯款了', a:'paid', red:true}, {t:'請家人幫我看', a:'family'}, {t:'為什麼危險？', a:'why'}];
@@ -445,13 +554,43 @@ async function analyseText(text, scen, label, shots, noEcho){
   if (r.level === 'high' && S.trig.high) fireCircle('高風險檢查結果');
 }
 async function handleShots(files){
-  const urls = files.map(f => URL.createObjectURL(f)); S.shots = urls;
-  me({kind:'img', urls}); if (!SAMPLE){ bot({kind:'text', text:['我在你的手機上讀截圖，第一次要下載中文字庫，大約 10–30 秒。']}); } typing();
-  try { const text = await ocr(files); untype(); bot({kind:'text', text:[`我讀到 ${text.split('\n').filter(l => !l.startsWith('【')).length} 則訊息，正在看整段對話…`]}); render();
-    await analyseText(text, '', '', urls, true);
+  const urls = files.map(f => URL.createObjectURL(f)); S.shots = urls; S.review = null;
+  me({kind:'img', urls});
+  if (SAMPLE){ typing();
+    try { const text = await ocr(files); untype(); bot({kind:'text', text:[`我讀到 ${text.split('\n').filter(l => !l.startsWith('【')).length} 則訊息，正在看整段對話…`]}); render();
+      await analyseText(text, '', '', urls, true, 'shot-ai'); return;
+    } catch (e) { untype(); if (e && e.code === 'not_granted'){ bot({kind:'text', text:['你還沒有允許使用 Claude，改用手機上的辨識。']}); } } }
+  const pm = {from:'bot', kind:'text', text:['我在你的手機上讀截圖，圖片不會上傳。第一次要下載中文字庫，大約 10–30 秒。']}; S.msgs.push(pm); typing(); render(true);
+  try { const res = await localOCR(files, i => { pm.text = [`正在讀第 ${i} 則訊息…`]; render(true); });
+    untype(); const n = res.items.filter(x => x.text).length;
+    pm.text = [`我讀到 ${n} 則訊息${res.name ? `（對方是「${res.name}」）` : ''}。`, '截圖辨識可能有錯字，請先幫我確認一下，再開始檢查。'];
+    S.review = {name:res.name, items:res.items, urls};
+    chips([{t:'確認讀到的內容', a:'review', main:true}, {t:'重新選截圖', a:'shot', ic:'img'}]); render(true); setTimeout(reviewSheet, 250);
   } catch (e) { untype();
-    const why = e && e.code === 'not_granted' ? '你還沒有允許原型使用 Claude，所以我讀不到截圖。' : e && e.code === 'empty' ? '截圖裡沒有讀到對話文字，換一張清楚一點的試試。' : e && e.code === 'offline' ? '需要網路才能下載截圖辨識的字庫。' : !SAMPLE ? '這張截圖沒有讀成功。' : '這次沒有讀成功。';
-    bot({kind:'text', text:[why, '你也可以把對話文字複製貼上給我。']}); chips([{t:'再傳一次截圖', a:'shot', ic:'img'}, {t:'改用貼上文字', a:'paste', ic:'text'}, {t:'試試範例', a:'examples'}]); render(); }
+    const why = e && e.code === 'empty' ? '截圖裡沒有讀到對話文字，換一張清楚一點的試試。' : e && e.code === 'offline' ? '需要網路才能下載截圖辨識的字庫。' : '這張截圖沒有讀成功。';
+    pm.text = [why, '你也可以把對話文字複製貼上給我。']; chips([{t:'再傳一次截圖', a:'shot', ic:'img'}, {t:'改用貼上文字', a:'paste', ic:'text'}, {t:'試試範例', a:'examples'}]); render(true); }
+}
+function reviewSheet(){
+  const R = S.review; if (!R) return;
+  const row = (it, i) => `<div class="rvrow ${it.who === 'me' ? 'me' : ''} ${it.low ? 'low' : ''}" data-i="${i}"><button class="rvwho" type="button" aria-label="切換是誰說的">${it.who === 'me' ? '我' : '對方'}</button><textarea rows="1" aria-label="第 ${i + 1} 句">${esc(it.text || '')}</textarea><button class="rvdel" type="button" aria-label="刪除這句">${I('x')}</button></div>`;
+  sheet(`<h3>確認讀到的對話</h3><p class="lede">截圖辨識可能有錯字，可以直接改。點<b>「我／對方」</b>切換是誰說的${R.items.some(x => x.low) ? '，<span style="color:var(--amber);font-weight:700">黃色框</span>是比較沒把握的句子' : ''}。</p>
+  <label class="rvname"><span>對方的名字</span><input type="text" id="rvn" value="${esc(R.name || '')}" placeholder="可不填，例如：阿明" maxlength="12"></label>
+  <div id="rvlist">${R.items.map((it, i) => it.day || it.del ? '' : row(it, i)).join('')}</div>
+  <button class="link" id="rvadd">${I('plus', 'style="width:18px;height:18px;vertical-align:-3px"')} 新增一句</button>
+  <button class="btn" id="rvok" style="margin-top:10px">確認，開始檢查</button>`);
+  const fit = t => { if (!t.offsetWidth) return; t.style.height = 'auto'; t.style.height = Math.min(160, t.scrollHeight) + 'px'; };
+  const wire = () => $$('#rvlist .rvrow').forEach(el => { const i = +el.dataset.i, it = R.items[i], ta = el.querySelector('textarea'); fit(ta);
+    ta.oninput = () => { it.text = ta.value; fit(ta); };
+    el.querySelector('.rvwho').onclick = e => { it.who = it.who === 'me' ? 'them' : 'me'; el.classList.toggle('me', it.who === 'me'); e.currentTarget.textContent = it.who === 'me' ? '我' : '對方'; };
+    el.querySelector('.rvdel').onclick = () => { it.del = true; el.remove(); }; });
+  wire(); setTimeout(() => $$('#rvlist textarea').forEach(fit), 320);
+  $('#rvn').oninput = e => { R.name = e.target.value.trim(); };
+  $('#rvadd').onclick = () => { R.items.push({who:'them', text:''}); const i = R.items.length - 1; $('#rvlist').insertAdjacentHTML('beforeend', row(R.items[i], i)); wire(); $(`#rvlist [data-i="${i}"] textarea`).focus(); };
+  $('#rvok').onclick = async () => { const name = (R.name || '').replace(/[：:]/g, '');
+    const lines = R.items.filter(it => !it.del && (it.day || (it.text || '').trim())).map(it => it.day ? `【${it.day}】` : `${it.who === 'me' ? '我' : (name || '對方')}：${it.text.trim().replace(/\n+/g, ' ')}`);
+    if (!lines.some(l => !l.startsWith('【'))){ toast('至少要有一句對話'); return; }
+    closeSheet(); const last = S.msgs.at(-1); if (last && last.kind === 'chips') last.used = true; const urls = R.urls; S.review = null;
+    me({kind:'text', text:[`已確認 ${lines.filter(l => !l.startsWith('【')).length} 則訊息`]}); await analyseText(lines.join('\n'), '', '', urls, true, 'shot'); };
 }
 // ---------- recover flow ----------
 function acctOf(){ const r = S.result; if (!r) return ''; const m = r.lines.map(l => l.text || '').join(' ').match(/\d{3}-\*{4}-\*{4}-\d{2,4}/); return m ? m[0] : ''; }
@@ -491,10 +630,11 @@ function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('�
 
 async function act(a){
   if (S.tab !== 'chat' && ['paste', 'sos', 'examples', 'paid'].includes(a)){ S.tab = 'chat'; S.page = null; }
-  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start') && a !== 'shot') last.used = true;
-  const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history'].includes(a)) me({kind:'text', text:[label]});
+  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start') && a !== 'shot' && a !== 'review') last.used = true;
+  const label = (S._chipLabel || '').trim(); if (label && !['shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
   if (a === 'reset' || a === 'newchat'){ closeDrawer(); newChat(); S.tab = 'chat'; S.page = null; render(); return; }
   if (a === 'history'){ S.tab = 'chat'; S.page = null; render(); openDrawer(); return; }
+  if (a === 'review'){ if (S.review) reviewSheet(); else toast('這段已經確認過了'); return; }
   if (a === 'shot'){ $('#shotin').click(); render(); return; }
   if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
   if (a === 'examples'){ bot({kind:'text', text:['選一段範例對話試試看：']}); chips(SCEN.map(s => ({t:s.name, a:'ex:' + s.id}))); render(true); return; }
@@ -559,6 +699,7 @@ function msgHTML(m, i){
   else if (m.kind === 'conv'){ const ls = m.text.split('\n').filter(Boolean).slice(0, 5); body = `<div class="bub">${m.label ? `<p>${esc(m.label)}</p>` : ''}<div class="mini">${ls.map(l => `<div>${esc(l)}</div>`).join('')}</div></div>`; }
   else if (m.kind === 'result'){ const r = m.r, L = LV[r.level];
     body = `<div class="res ${r.level}"><div class="top">${tl(L.on)}<div><h3>${L.n}<br>${L.a}</h3></div></div><div class="body">${r.type && r.type !== '一般對話' ? `<span class="type">這可能是${esc(r.type)}。</span>` : ''}${esc(r.why)}
+      ${r.facts && r.facts.length ? `<div class="facts">${r.facts.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
       ${r.names.length ? `<div class="tags">${r.names.map(n => `<span class="tag">${esc(n)}</span>`).join('')}</div>` : ''}<div style="margin-top:8px"><span class="badge ${r.ai ? '' : 'm'}">${r.ai ? 'Claude AI 分析' : !SAMPLE ? '防詐規則判斷' : r.aiFail ? '規則版（AI 暫時無法使用）' : '規則版（範例）'}</span></div></div>
       ${r.level === 'low' ? '' : `<div class="btns"><button class="btn red" data-act="call" data-label="打電話查證">${I('phone')}先別付款，打電話查證</button></div>`}</div>`; }
   else if (m.kind === 'why'){ const r = m.r, hits = RULES.filter(x => r.found[x.k]);
@@ -690,7 +831,7 @@ function caseText(kind){
   const L = [head];
   if (kind === 'sos' && S.rec && S.rec.amount) L.push(`已匯出：約 ${Number(S.rec.amount).toLocaleString('en-US')} 元`);
   if (!S.shareChat || !r) return L.join('\n');
-  L.push(`風險：${LV[r.level].n}`); if (r.type && r.type !== '一般對話') L.push(`類型：${r.type}`); if (r.names.length) L.push(`警訊：${r.names.join('、')}`); L.push(`說明：${r.why}`);
+  L.push(`風險：${LV[r.level].n}`); if (r.type && r.type !== '一般對話') L.push(`類型：${r.type}`); (r.facts || facts(r)).forEach(([k, v]) => L.push(`${k}：${v}`)); if (r.names.length) L.push(`警訊：${r.names.join('、')}`); L.push(`說明：${r.why}`); L.push(`來源：${SRC[r.src] || '本人提供'}`);
   const enc = new TextEncoder(); let out = L.join('\n') + '\n— 對話 —';
   for (const l of r.lines){ const s = l.who === undefined ? `【${l.day}】` : (l.who ? `${l.who}：` : '') + l.text;
     if (enc.encode(out + '\n' + s).length > 3800){ out += '\n…（對話太長，只附前面）'; break; } out += '\n' + s; }
@@ -717,7 +858,7 @@ function newCode(){ const a = new Uint8Array(8); crypto.getRandomValues(a); retu
 const fmtCode = c => c.slice(0, 4) + '-' + c.slice(4);
 function pubInvite(m){ if (!m.code) return; m.invAt = Date.now(); pub(m.topic, JSON.stringify({n:S.me || '家人', r:m.rel}), {tags:['whoscam-invite']}).catch(() => { m.invAt = 0; }); }
 function parseCase(msg){ const k = msg.indexOf('\n— 對話 —'); const top = k < 0 ? msg : msg.slice(0, k), conv = k < 0 ? '' : msg.slice(k + 7).replace(/^\n/, '');
-  const L = top.split('\n'), o = {head:L[0], conv}; L.slice(1).forEach(l => { const m = l.match(/^(風險|類型|警訊|說明|已匯出)：(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
+  const L = top.split('\n'), o = {head:L[0], conv}; L.slice(1).forEach(l => { const m = l.match(/^(風險|類型|警訊|說明|已匯出|對方|要求|金額|期限|帳號|連結|來源)：(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
 function openCase(topic, id){ const g = S.guarding.find(x => x.topic === topic); const a = g && g.alerts.find(x => x.id === id); if (!a) return;
   a.seen = true; S.caseRef = {topic, id}; S.tab = 'family'; S.page = 'case'; closeSheet(); render(); }
 const CASE = {title:() => '家人的狀況', html:() => {
@@ -727,10 +868,12 @@ const CASE = {title:() => '家人的狀況', html:() => {
   const an = c.conv ? analyse(c.conv) : null, tags = c['警訊'] ? c['警訊'].split('、') : [];
   return `<div class="res ${lvl}" style="width:100%;margin:10px 0 4px"><div class="top">${tl(LV[lvl].on)}<div><h3>${esc(g.name)}${a.test ? '傳了測試通知' : c['風險'] ? '：' + esc(c['風險']) : '需要你'}</h3><div class="lede" style="margin:2px 0 0;font-size:13.5px">${when(a.time)}</div></div></div>
     <div class="body"><p style="margin:0 0 6px"><b>${esc(c.head)}</b></p>${c['已匯出'] ? `<p style="margin:0 0 6px;color:var(--red);font-weight:700">已匯出：${esc(c['已匯出'])}</p>` : ''}${c['說明'] ? esc(c['說明']) : ''}${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>` : ''}</div></div>
+  ${['對方', '要求', '金額', '期限', '帳號', '連結'].some(k => c[k]) ? `<div class="sec"><h3>重點整理</h3></div><div class="card facts big">${[['對方', '對方'], ['要求', '對方要他'], ['金額', '金額'], ['期限', '期限'], ['帳號', '對方帳號'], ['連結', '連結']].filter(([k]) => c[k]).map(([k, lb]) => `<div><span>${lb}</span><b>${esc(c[k])}</b></div>`).join('')}</div>` : ''}
   ${a.test ? '' : `<div class="sec"><h3>建議你這樣做</h3></div><div class="card"><ol class="todo"><li>用你平常的號碼打給${esc(g.name)}，不要用訊息裡的電話</li><li>提醒他先不要付款、不要給驗證碼或帳密</li><li>${c['已匯出'] ? '陪他打給銀行和 165，越快越有機會攔下來' : '不確定的話，一起打 165 問'}</li></ol></div>
   <button class="btn" id="ack" ${a.acked ? 'disabled' : ''}>${I('check')}${a.acked ? '已回覆「我看到了」' : '回覆：我看到了，馬上聯絡你'}</button>
   <a class="btn red" href="tel:165">${I('phone')}撥打 165 反詐騙專線</a>`}
-  ${an ? `<div class="sec"><h3>${esc(g.name)}收到的對話</h3><span class="lede" style="margin:0;font-size:13px">紅色是有警訊的訊息</span></div><div class="full card">${an.lines.map(o => o.who === undefined ? `<div class="lede" style="text-align:center;margin:8px 0 2px;font-size:13px">${esc(o.day)}</div>` : `<div class="b ${o.hits.length ? 'hit' : ''}">${o.who ? `<small>${esc(o.who === '我' ? g.name : o.who)}</small>` : ''}${esc(o.text)}${o.hits.length ? `<small><em>${o.hits.map(k => RULES.find(x => x.k === k).name).join('、')}</em></small>` : ''}</div>`).join('')}</div>`
+  ${an ? `<div class="sec"><h3>對話內容</h3><span class="lede" style="margin:0;font-size:13px">紅框是有警訊的訊息</span></div>
+    <div class="card cv">${c['來源'] ? `<div class="cvsrc">${I('shield', 'style="width:16px;height:16px;vertical-align:-3px"')} 來源：${esc(c['來源'])}</div>` : ''}${an.lines.map(o => o.who === undefined ? `<div class="cvday">${esc(o.day)}</div>` : `<div class="cvm ${o.who === '我' ? 'me' : ''} ${o.hits.length ? 'hit' : ''}"><small>${esc(o.who === '我' ? g.name : o.who || '對方')}</small>${esc(o.text)}${o.hits.length ? `<em>${o.hits.map(k => RULES.find(x => x.k === k).name).join('、')}</em>` : ''}</div>`).join('')}</div>`
     : a.test ? '' : `<div class="card"><div class="lede" style="margin:0">${esc(g.name)}這次沒有附上對話。</div></div>`}`; },
   after:() => { const b = $('#ack'); if (!b) return; b.onclick = async () => { const g = S.guarding.find(x => x.topic === S.caseRef.topic), a = g.alerts.find(x => x.id === S.caseRef.id); b.disabled = true;
     try { await pub(g.topic, `${S.me || '家人'} 看到了，會馬上聯絡你。`, {title:'Whoscam 守護圈', tags:['eyes', 'whoscam-ack']}); a.acked = true; toast(`已告訴${g.name}你看到了`); render(false); } catch (e) { b.disabled = false; toast('沒有送出，請檢查網路'); } }; }};
