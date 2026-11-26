@@ -265,6 +265,9 @@ h2.hi{font-size:26px;line-height:1.2;font-weight:900;margin:10px 0 4px}
 .link{border:0;background:none;color:var(--brand);font-weight:700;font-size:15px;min-height:44px;padding:0}
 .overlay{position:absolute;inset:0;background:#0007;display:flex;align-items:flex-end;opacity:0;visibility:hidden;transition:.25s;z-index:5}
 .overlay.on{opacity:1;visibility:visible}
+.aa{border:1.5px solid var(--line);background:var(--bg);color:var(--brandink);border-radius:99px;height:40px;padding:0 12px;font:800 16px ui-rounded,-apple-system,"SF Pro Rounded",system-ui,sans-serif;flex:none}
+:root[data-big] .aa{background:var(--brandsoft);border-color:var(--brand)}
+:root[data-big] .view,:root[data-big] .compose,:root[data-big] .sheet{zoom:1.15}
 .sheet{background:var(--bg);width:100%;max-height:88%;overflow:auto;border-radius:26px 26px 0 0;padding:10px 18px 22px;transform:translateY(30px);transition:.25s}
 .overlay.on .sheet{transform:none}
 .grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
@@ -476,7 +479,7 @@ const fresh = () => ({tab:'home', tip:Math.floor(Math.random() * 6), page:null, 
   circle:/[?&]demo/.test(location.search) ? [{id:1,name:'志明',rel:'弟弟',status:'active',c:0}] : [], me:'', guarding:[], synced:0, chats:[], cur:'c' + Date.now(), shareChat:true, trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
   rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
 let S = fresh();
-const BUILD = '2026-11-26.1';
+const BUILD = '2026-11-26.2';
 let SAMPLE = null, TTS = null, DICT = null;
 if (/[?&]demo/.test(location.search)) document.documentElement.classList.add('demo');
 function webTTS(){ if (!('speechSynthesis' in window)) return null;
@@ -684,6 +687,7 @@ async function analyseText(text, scen, label, shots, noEcho, src, o){
   const list = r.level === 'low' ? [{t:'再檢查另一段', a:'shot', ic:'img'}, {t:'為什麼這樣判斷？', a:'why'}] :
     [{t:'我已經匯款了', a:'paid', red:true}, {t:'我該怎麼回？', a:'reply'}, {t:'請家人幫我看', a:'family'}, {t:'為什麼危險？', a:'why'}];
   if (TTS) list.push({t:'唸給我聽', a:'speak', ic:'speak'});
+  list.push({t:'分享結果給親友', a:'shareres', ic:'people'});
   list.push({t:'問新問題', a:'newchat', ic:'edit', dim:true}); S.scrollTo = '.res';
   chips(list); render();
   if (r.level === 'high' && navigator.vibrate) try { navigator.vibrate([60, 40, 60]); } catch (e) {}
@@ -822,21 +826,31 @@ function bankSheet(){ const att = attachList();
     bot({kind:'text', text:['銀行建議（示範）：已暫停網銀非約定轉帳 24 小時，請立即變更網銀密碼。', '確認受騙的話，也請撥 165 報案，把這份報告給警察。']});
     chips([{t:'打 165', a:'call', ic:'phone'}, {t:'複製報告', a:'r_copy', ic:'copy'}, {t:'完成', a:'done'}]); render(true); };
 }
+function resultText(r){ const L = LV[r.level];
+  return [`【Whoscam 檢查結果】${L.n}：${L.a}`, r.type && r.type !== '一般對話' ? `這可能是${r.type}。` : '', r.why, r.names && r.names.length ? `警訊：${r.names.join('、')}` : '',
+    r.level !== 'low' ? '提醒：先不要付款，自己打 165 或官方電話查證。' : '', `用 Whoscam 檢查可疑訊息：${location.origin}${location.pathname}`].filter(Boolean).join('\n'); }
+function shareResult(){ const r = S.result; if (!r) return; const txt = resultText(r);
+  if (navigator.share) navigator.share({title:'Whoscam 檢查結果', text:txt}).catch(() => {});
+  else window.open('https://line.me/R/share?text=' + encodeURIComponent(txt), '_blank', 'noopener'); }
 function copyText(t){ try { navigator.clipboard.writeText(t).then(() => toast('已複製報告'), () => toast('無法複製，請長按文字手動複製')); } catch (e) { toast('無法複製，請長按文字手動複製'); } }
 
 async function act(a){
   if (S.tab !== 'chat' && ['paste', 'sos', 'examples', 'paid'].includes(a)){ S.tab = 'chat'; S.page = null; }
-  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start' || last.kind === 'exlist') && a !== 'shot' && a !== 'review') last.used = true;
-  const label = (S._chipLabel || '').trim(); if (label && !['dash', 'famsos', 'shot', 'speak', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
+  const last = S.msgs.at(-1); if (last && (last.kind === 'chips' || last.kind === 'start' || last.kind === 'exlist') && !['shot', 'review', 'shareres', 'speak'].includes(a)) last.used = true;
+  const label = (S._chipLabel || '').trim(); if (label && !['dash', 'famsos', 'shot', 'speak', 'shareres', 'r_edit', 'r_more', 'full', 'reset', 'newchat', 'history', 'review'].includes(a)) me({kind:'text', text:[label]});
   if (a === 'reset' || a === 'newchat'){ closeDrawer(); newChat(); S.tab = 'chat'; S.page = null; render(); return; }
   if (a === 'history'){ S.tab = 'chat'; S.page = null; render(); openDrawer(); return; }
   if (a === 'review'){ if (S.review) reviewSheet(); else toast('這段已經確認過了'); return; }
+  if (a === 'shareres'){ shareResult(); return; }
   if (a === 'reply'){ if (S.result) bot({kind:'reply', r:S.result}); render(true); return; }
   if (a === 'dash'){ window.open(DASH, '_blank', 'noopener'); return; }
   if (a === 'famsos'){ startSOS(); S.msgs.splice(-2); S.rec.who = 'family'; S.flow = 'note'; bot({kind:'text', text:['用一句話告訴我，你觀察到家人怎麼了？', '例如：媽媽一直講投資老師，說要去解定存。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
   if (a === 'shot' && !SAMPLE) ocrWorker().catch(() => {});
   if (a === 'shot'){ $('#shotin').click(); render(); return; }
-  if (a === 'paste'){ bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true); setTimeout(() => $('#msg') && $('#msg').focus(), 200); return; }
+  if (a === 'paste'){ const clip = navigator.clipboard && navigator.clipboard.readText ? navigator.clipboard.readText().catch(() => '') : Promise.resolve('');
+    bot({kind:'text', text:['把對話貼在下面的輸入框，或用打字、用說的描述發生什麼事，按送出就好。']}); render(true);
+    setTimeout(async () => { const box = $('#msg'); if (!box) return; box.focus(); const t = String(await clip || '').trim();
+      if (t.length >= 6 && !box.value){ box.value = t.slice(0, 4000); box.dispatchEvent(new Event('input', {bubbles:true})); toast('已貼上你剛複製的內容，確認後按送出'); } }, 200); return; }
   if (a === 'examples'){ bot({kind:'text', text:['選一段範例試試看。這些都是 165 和刑事局公布過的常見手法；「一般」是正常訊息，可以看看哪些會被提醒。']}); S.msgs.push({from:'bot', kind:'exlist'}); render(true); return; }
   if (a.startsWith('ex:')){ const s = SCEN.find(x => x.id === a.slice(3)); S.msgs.pop(); S.shots = []; await analyseText(s.text, s.id, '範例：' + s.name); if (s.g !== '一般') S._ex = true; return; }
   if (a === 'why'){ const r = S.result; bot({kind:'why', r}); chips([{t:'看整段對話標示', a:'full'}, ...(r.level === 'low' ? [] : [{t:'我已經匯款了', a:'paid', red:true}])]); render(true); return; }
@@ -972,8 +986,8 @@ function render(bottom){
   } else {
     const cp = $('#compose'); if (cp._k){ cp.innerHTML = ''; cp._k = null; }
     const V = S.page === 'video' ? VIDEO : S.page === 'case' ? CASE : S.tab === 'home' ? HOME : S.tab === 'family' ? FAMILY : LEARN;
-    setHTML($('#head'), V === HOME ? `<div class="logo">W</div><div class="t"><b>Whoscam</b>${status}</div><button class="badge" data-tab="learn" style="border:0;font-size:14px;padding:6px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</button>`
-      : `${S.page ? `<button class="iconbtn" id="back" aria-label="返回">${I('back')}</button>` : ''}<div class="t"><b style="font-size:19px">${V.title()}</b></div><span class="badge" style="font-size:14px;padding:4px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</span>`);
+    setHTML($('#head'), V === HOME ? `<div class="logo">W</div><div class="t"><b>Whoscam</b>${status}</div><button class="aa" data-aa aria-label="${S.big ? '改回一般字體' : '放大字體'}" aria-pressed="${!!S.big}">${S.big ? 'A−' : 'A+'}</button><button class="badge" data-tab="learn" style="border:0;font-size:14px;padding:6px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</button>`
+      : `${S.page ? `<button class="iconbtn" id="back" aria-label="返回">${I('back')}</button>` : ''}<div class="t"><b style="font-size:19px">${V.title()}</b></div><button class="aa" data-aa aria-label="${S.big ? '改回一般字體' : '放大字體'}" aria-pressed="${!!S.big}">${S.big ? 'A−' : 'A+'}</button><span class="badge" style="font-size:14px;padding:4px 12px;background:var(--brandsoft);color:var(--brandink)">${S.pts} 點</span>`);
     const keepY = bottom === false && !moved ? v.scrollTop : 0;
     v._mode = 'page'; v.className = 'view pagev' + (moved ? ' fade' : ''); v.innerHTML = V.html(); V.after && V.after();
     v.scrollTop = keepY;
@@ -1003,7 +1017,7 @@ const HOME = {title:() => 'Whoscam', html:() => {
   after:() => { $('#nexttip').onclick = () => { S.tip++; render(false); }; }};
 // ---------- real family circle (ntfy.sh) ----------
 const NTFY = 'https://ntfy.sh', BASE = location.origin + location.pathname, DEMO = /[?&]demo/.test(location.search);
-const STORE = 'whoscam-store-v1', KEEP = ['me', 'circle', 'guarding', 'trig', 'shareChat', 'paused', 'pts', 'today', 'done', 'codes', 'log', 'tip', 'chats'];
+const STORE = 'whoscam-store-v1', KEEP = ['big', 'me', 'circle', 'guarding', 'trig', 'shareChat', 'paused', 'pts', 'today', 'done', 'codes', 'log', 'tip', 'chats'];
 function chatTitle(){ const r = S.result;
   if (S.rec) return S.rec.sent ? '已通報銀行' : S.rec.who === 'family' ? '家人求助' : '我被騙了';
   if (r) return r.type && r.type !== '一般對話' ? '疑似' + r.type.replace(/^疑似/, '') : '一般對話';
@@ -1291,6 +1305,7 @@ function fullSheet(){ const r = S.result; if (!r) return;
 function renderTasks(){ $('#tasks').innerHTML = TASKS.map(t => `<div class="task ${S.tasks[t[0]] ? 'ok' : ''}"><div class="tick">${S.tasks[t[0]] ? I('check', 'style="width:18px;height:18px;stroke-width:3"') : ''}</div><div><b>${t[1]}</b><span>${t[2]}${t[0] === 't3' && S.rec && S.rec.secs ? `（上次 ${S.rec.secs} 秒）` : ''}</span></div></div>`).join(''); }
 
 document.addEventListener('click', e => {
+  if (e.target.closest('[data-aa]')){ S.big = !S.big; document.documentElement.toggleAttribute('data-big', S.big); save(); render(); toast(S.big ? '已放大字體，再按一次改回來' : '已改回一般字體'); return; }
   const t = e.target.closest('[data-tab]'); if (t){ if (S.tab === 'home' && t.dataset.tab !== 'home') pushLayer(); S.tab = t.dataset.tab; S.page = null; render(); return; }
   if (e.target.closest('#menubtn')){ openDrawer(); return; }
   if (e.target.closest('#back')){ if (S.timer){ clearInterval(S.timer); S.timer = null; } S.page = null; render(); return; }
@@ -1311,7 +1326,7 @@ window.addEventListener('popstate', () => {
 $('#shotin').onchange = e => { const f = [...e.target.files].slice(0, 10); e.target.value = ''; if (f.length){ S.tab = 'chat'; S.flow = null; handleShots(f); } };
 $('#morein').onchange = e => { [...e.target.files].slice(0, 6).forEach(f => S.rec.extra.push({k:'up', u:f.type.startsWith('image/') ? URL.createObjectURL(f) : '', n:f.name.slice(0, 30)})); e.target.value = ''; toast('已加入證據'); render(); };
 $('#reset').onclick = () => { if (S.timer) clearInterval(S.timer); closeSheet(); S = fresh(); greet(); render(); renderTasks(); toast('已重新開始'); };
-load(); greet(); render(); renderTasks(); checkJoin(); sync();
+load(); document.documentElement.toggleAttribute('data-big', !!S.big); greet(); render(); renderTasks(); checkJoin(); sync();
 setInterval(() => { if (!document.hidden) sync(); }, 20000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
 window.addEventListener('online', () => sync());
