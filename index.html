@@ -476,7 +476,7 @@ const fresh = () => ({tab:'home', tip:Math.floor(Math.random() * 6), page:null, 
   circle:/[?&]demo/.test(location.search) ? [{id:1,name:'志明',rel:'弟弟',status:'active',c:0}] : [], me:'', guarding:[], synced:0, chats:[], cur:'c' + Date.now(), shareChat:true, trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
   rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
 let S = fresh();
-const BUILD = '2026-11-25.10';
+const BUILD = '2026-11-26.1';
 let SAMPLE = null, TTS = null, DICT = null;
 if (/[?&]demo/.test(location.search)) document.documentElement.classList.add('demo');
 function webTTS(){ if (!('speechSynthesis' in window)) return null;
@@ -1273,7 +1273,7 @@ const LEARN = {title:() => '防詐小劇場', html:() => { const nextR = SHOP.fi
     $$('[data-buy]').forEach(b => b.onclick = () => { const r = SHOP.find(x => x.id === b.dataset.buy); if (S.pts < r.p) return; S.pts -= r.p; S.codes.push(`${r.n}：WC-${Math.random().toString(36).slice(2, 8).toUpperCase()}`); toast('兌換成功'); render(); }); }};
 
 const VIDEO = {title:() => VIDEOS.find(x => x.id === S.vid).s, html:() => { const v = VIDEOS.find(x => x.id === S.vid);
-  if (S.prog < 100) return `<div class="vp"><video id="vp" src="videos/${v.id}.mp4" poster="videos/${v.id}.jpg" controls playsinline preload="metadata"></video></div><div class="prog"><i id="pbar" style="width:${S.prog}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px"><span class="lede" style="font-size:13.5px;margin:0">看完就開放 3 題測驗</span><button class="link" id="skip" style="font-size:13px;color:var(--mute)">測試用：跳到測驗</button></div>`;
+  if (S.prog < 100) return `<div class="vp"><video id="vp" src="videos/${v.id}.mp4?b=2" poster="videos/${v.id}.jpg" controls playsinline preload="metadata"></video></div><div class="prog"><i id="pbar" style="width:${S.prog}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px"><span class="lede" style="font-size:13.5px;margin:0">看完就開放 3 題測驗</span><button class="link" id="skip" style="font-size:13px;color:var(--mute)">測試用：跳到測驗</button></div>`;
   if (S.q >= 3){ const all = S.right === 3; return `<div style="text-align:center;padding:30px 0"><div style="width:84px;height:84px;border-radius:50%;margin:0 auto 10px;display:grid;place-items:center;background:${all ? 'var(--greensoft)' : 'var(--ambersoft)'};color:${all ? 'var(--green)' : 'var(--amber)'}">${I(all ? 'check' : 'speak', 'style="width:42px;height:42px"')}</div><h2 class="hi">${all ? (S.gain ? `全對！+${S.gain} 點` : '全對！') : `答對 ${S.right}/3 題`}</h2><p class="lede">${all ? (S.gain ? '點數已存入，可以去兌換好禮。' : '這部的點數已經領過，或今天已達上限。') : '全對才有點數，明天再試試。'}</p><button class="btn" id="tolearn">回到小劇場</button></div>`; }
   const q = v.qs[S.q], done = S.pick !== null;
   return `<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 4px"><b>小測驗</b><div class="dots">${[0, 1, 2].map(i => `<i class="${i <= S.q ? 'on' : ''}"></i>`).join('')}</div></div><p style="font-size:19px;font-weight:700;line-height:1.4">${q[0]}</p>
