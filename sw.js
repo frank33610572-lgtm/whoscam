@@ -1,4 +1,4 @@
-const CACHE = 'whoscam-v13';
+const CACHE = 'whoscam-v14';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'videos/v1.jpg', 'videos/v2.jpg', 'videos/v3.jpg', 'videos/v4.jpg'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL))); self.skipWaiting(); });

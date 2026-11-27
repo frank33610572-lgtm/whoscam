@@ -357,6 +357,9 @@ const I = (k, x = '') => `<svg class="i" viewBox="0 0 24 24" ${x}>${P[k]}</svg>`
 const SCEN = [
  {id:'loan', g:'簡訊', name:'假貸款簡訊', text:`【永豐貸】\n提醒您已獲50萬新台幣借款資格。\n每一萬塊月利息只需60塊。月繳無壓力！無需照會，無需保人，沒有手續費。\n當天辦理當天入賬！19年口碑第一貸款公司。\n添加信貸專員免費咨詢改善財務問題 LINE：gi6600`},
  {id:'etc', g:'簡訊', name:'ETC 欠費簡訊', text:`【遠通電收】您的車輛有一筆46元通行費逾期未繳，請於今日23:59前完成繳納，以免產生滯納金並暫停服務：https://fetc-pay.tw-service.cc/p`},
+ {id:'pts', g:'簡訊', name:'點數到期', text:`【momo購物】親愛的會員，您有3,280點紅利點數將於今日到期，請盡快兌換家電好禮：https://momo-point.cc/vip`},
+ {id:'apk', g:'簡訊', name:'假資安更新', text:`【數位發展部】偵測到您的手機存在資安風險，請於24小時內下載安全更新元件：https://moda-safe.cc/update.apk`},
+ {id:'power', g:'簡訊', name:'台電停電通知', text:`【台灣電力公司】您的電費已逾期未繳，本公司將於今日17:00停止供電，請立即點擊繳費：https://taipower-pay.top/b`},
  {id:'prize', g:'簡訊', name:'抽中獎品', text:`【會員中心】恭喜您抽中 iPhone 17！請於24小時內點擊連結填寫收件資料，並支付運費50元領取：https://lucky-gift.top/tw`},
  {id:'inv', g:'對話', name:'投資群組', text:`【第 1 天】\n陳老師：歡迎加入「穩健財富交流群」，我每天分享免費盤勢分析。\n我：謝謝老師！\n【第 6 天】\n陳老師：上週跟單的同學都賺了 18%，這個平台保證獲利、穩賺不賠。\n陳老師：名額有限，私訊助理小美開戶。\n【第 14 天】\n助理小美：老師今天開放最後 3 個名額，今晚 9 點前入金 5 萬就能參加。\n助理小美：請匯款到以下帳戶 012-3456-7890-12，戶名王小明。\n助理小美：這是內部機會，不要跟家人說，銀行問就說是買家具。`},
  {id:'love', g:'對話', name:'網友帶投資', text:`Kevin：寶貝早安，今天也要開心喔\n我：早安～\nKevin：我叔叔在交易所工作，這個平台有內部數據，穩賺不賠\nKevin：你先入金3萬試試，我帶你操作\n我：我賺了，可是要領出來說要先繳錢？\nKevin：出金要先繳20%保證金才能解凍，大家都這樣`},
@@ -391,10 +394,10 @@ const RULES = [
  {k:'remote', name:'要你分享螢幕', tip:'分享螢幕或裝遠端 App，對方就能看到你的密碼', w:4, re:/(分享螢幕|螢幕(分享|共享)|共享螢幕|視訊.{0,6}(分享|共享)|遠端(操作|控制|協助)|AnyDesk|TeamViewer)/i},
  {k:'points', name:'要你買點數', tip:'正當單位不會叫你買遊戲點數付款', w:4, re:/(遊戲點數|點數卡|GASH|MyCard|禮品卡|超商.{0,4}(代碼|繳費代碼))/i},
  {k:'loan', name:'假貸款話術', tip:'銀行不會用簡訊叫你加 LINE 專員，撥款前也不會先收錢', w:3, re:/((貸款|借款|信貸|融資|撥款|額度|核貸).{0,30}(免照會|無需照會|免保人|無需保人|免連保|快速撥款|當天(辦理|入帳|入賬|撥款)|免財力|信用不良|低利|利息只需)|(免照會|無需照會|免保人|無需保人|已獲.{0,12}(資格|額度)|信貸專員|融資專員|代辦貸款))/},
- {k:'cs', name:'假客服說扣錯款', tip:'沒有「解除分期」或「金流簽署」這種事，不要照指示操作 ATM 或網銀', w:4, re:/(分期.{0,8}(誤設|錯誤|重複|解除)|(誤設|重複扣款|設定錯誤|升級成?\s*(VIP|批發商|會員))|解除(分期|設定)|金流(簽署|認證|驗證|服務|異常)|簽署.{0,4}(金流|協議)|實名認證|(賣貨便|好賣\+?|交貨便|蝦皮|旋轉拍賣).{0,16}(認證|簽署|凍結|客服|無法下單|升級)|(無法|沒辦法)(下單|下標|付款).{0,12}(客服|認證|簽署|連結)|保障(服務|協議)|(QR\s*Code|條碼).{0,8}(轉帳|網銀|驗證)|賣場(升級|未開通|沒有.{0,4}認證))/i},
+ {k:'cs', name:'假客服說扣錯款', tip:'沒有「解除分期」或「金流簽署」這種事，不要照指示操作 ATM 或網銀', w:4, re:/(分期.{0,8}(誤設|錯誤|重複|解除)|(誤設|重複扣款|設定錯誤|升級成?\s*(VIP|批發商|會員))|解除(分期|設定)|金流(簽署|認證|驗證|服務|異常)|重複(訂購|下單)|訂單(異常|錯誤|重複)|簽署.{0,4}(金流|協議)|實名認證|(賣貨便|好賣\+?|交貨便|蝦皮|旋轉拍賣).{0,16}(認證|簽署|凍結|客服|無法下單|升級)|(無法|沒辦法)(下單|下標|付款).{0,12}(客服|認證|簽署|連結)|保障(服務|協議)|(QR\s*Code|條碼).{0,8}(轉帳|網銀|驗證)|賣場(升級|未開通|沒有.{0,4}認證))/i},
  {k:'job', name:'高薪輕鬆工作', tip:'錢多事少、免經驗的工作，多半是要你的帳戶', w:2, re:/(日領|日薪\s*\d|在家(工作|賺|打字)|打字(員|兼職)|家庭代工|免經驗|輕鬆賺|代收(包裹|貨款)|包吃包住|高薪)/},
  {k:'freebie', name:'天上掉下來的好康', tip:'中獎、免費送卻要你付運費或填資料，多半是釣魚', w:2, re:/(恭喜(您|你)?.{0,4}(抽中|中獎|獲得)|抽中|中獎|免費(送|領|贈)|贈送|結緣|壓轎金|只(需|要)付?運費|領取.{0,6}(獎|禮|補助|退款|現金)|補助金|普發|退款|退費)/},
- {k:'bill', name:'假催繳通知', tip:'機關和物流不會用簡訊附連結叫你繳費，自己上官方 App 查', w:2, re:/(欠費|未繳|逾期未|罰單|罰鍰|停車費|通行費|ETC|電費|水費|帳單|滯納金|地址(不全|錯誤|不明)|包裹.{0,8}(無法|暫停|退回|異常)|關稅|(黑貓|宅急便|新竹物流|嘉里|順豐).{0,12}(異常|凍結|無法配送|更新|填寫))/i},
+ {k:'bill', name:'假催繳通知', tip:'機關和物流不會用簡訊附連結叫你繳費，自己上官方 App 查', w:2, re:/(欠費|未繳|逾期未|罰單|罰鍰|停車費|通行費|ETC|電費|水費|帳單|滯納金|地址(不全|錯誤|不明)|包裹.{0,8}(無法|暫停|退回|異常)|關稅|吊扣駕照|吊銷駕照|移送(強制)?執行|強制執行|停(電|水)|違反道路交通|(黑貓|宅急便|新竹物流|嘉里|順豐).{0,12}(異常|凍結|無法配送|更新|填寫))/i},
  {k:'platform', name:'要你加 LINE 或私下聯絡', tip:'陌生人叫你加 LINE、離開平台，就失去保障', w:2, re:/(加.{0,6}(LINE|賴|line|Line)|LINE\s*(ID)?\s*[：:＠@]|ID\s*[：:]|添加.{0,10}(LINE|專員|客服)|私訊|私下交易|不走平台|離開平台|下載.{0,8}(App|APP|程式)|@[a-z0-9_.-]{3,})/i},
  {k:'link', name:'陌生連結', tip:'付款或登入連結可能是釣魚網站，不要點', w:2, re:/(點擊連結|點這個連結|點下方連結|點連結)/},
  {k:'fakeurl', name:'假冒官方的網址', tip:'自稱政府、銀行或大公司，但網址不是他們的官方網址', w:5, re:/$^/},
@@ -404,7 +407,7 @@ const RULES = [
  {k:'extort', name:'威脅要散布影片', tip:'對方拿影片或照片威脅你付錢，付了只會被要更多', w:6, re:/((散布|散播|傳給|寄給|發給|(?<!不)公開|外流|貼到).{0,12}(影片|照片|裸照|視訊|錄影)|(影片|照片|裸照|視訊|錄影).{0,24}(散布|散播|傳給|寄給|發給|(?<!不)公開|外流|貼到)|(影片|照片|視訊).{0,8}(錄下來|截圖)|錄下來了|不雅(影片|照片)|私密(影片|照片))/},
  {k:'telecom', name:'假電信語音催繳', tip:'電信公司語音催繳只有錄音，不會叫你按鍵轉接專人', w:3, re:/((中華電信|台灣大哥大|遠傳|亞太電信|台灣之星|電信公司).{0,24}(欠費|未繳|逾期|停話|停機|帳單)|(電話費|話費|門號).{0,10}(欠費|逾期|未繳|停話|停機)|按\s*9|轉接(專人|客服)|語音(通知|催繳))/},
  {k:'fake165', name:'叫你不要掛電話直接打 165', tip:'真正的 165 不會被轉接；要你不掛電話直接按 165，一定是詐騙', w:5, re:/((不要|別)掛(斷)?電話.{0,12}165|165.{0,6}(轉接|分機)|直接(按|撥)\s*165|轉接.{0,4}165|安全帳戶)/},
- {k:'group', name:'拉你進投資或福利群組', tip:'先送贈品、拉進群組每天簽到，再帶你投資，是假投資常見開頭', w:2, re:/((拉|邀請|加入).{0,6}(群組|社群|福利群|投資群|VIP群)|福利群|每天簽到|簽到送|飆股|老師(分享|帶)|VIP)/i},
+ {k:'group', name:'拉你進投資或福利群組', tip:'先送贈品、拉進群組每天簽到，再帶你投資，是假投資常見開頭', w:2, re:/((拉|邀請|加入).{0,6}(群組|社群|福利群|投資群|VIP群)|福利群|每天簽到|簽到送|飆股|老師(分享|帶)|VIP\s*(群|會員群|專屬群))/i},
  {k:'foreign', name:'境外或偽造來電', tip:'顯示 +886 或 + 開頭的來電多半是境外偽造，掛掉自己回撥官方', w:2, re:/(\+886|\+\d{1,3}\s?\d|00\d{3}\d+|境外來電|國際電話)/},
  {k:'ship', name:'要你寄卡片或現金', tip:'政府、銀行和正當交易都不會叫你用超商店到店或快遞寄金融卡、存摺或現金', w:5, re:/^(?=.*(寄|裝箱|裝進|放進|打包)).*((店到店|交貨便|賣貨便|宅配|快遞|包裹|紙箱|裝箱).{0,20}(金融卡|提款卡|存摺|現金|現鈔)|(金融卡|提款卡|存摺|現金|現鈔).{0,20}(店到店|交貨便|宅配|快遞|裝箱|紙箱|寄到.{0,6}門市))/},
  {k:'bindpay', name:'要你綁定支付或換新手機', tip:'要你把信用卡感應綁定、綁電子支付或買新手機裝 App，是「金融接管」：對方會直接盜刷和攔截銀行來電', w:5, re:/((感應|綁定|綁卡).{0,10}(信用卡|金融卡|電子支付|行動支付|街口|icash|全盈|悠遊付|Apple Pay|Google Pay|LINE Pay)|(信用卡|金融卡).{0,8}(逐一|全部|一張一張).{0,6}(感應|綁定)|(買|換|準備).{0,4}(一支)?新(的)?手機.{0,16}(下載|安裝|App|APP|查證|配合))/i},
@@ -412,14 +415,17 @@ const RULES = [
  {k:'boss', name:'冒充主管或長官', tip:'自稱老闆、主管或長官，要你加 LINE 或急著匯款給廠商，要先打他原本的電話確認', w:3, re:/((我是|自稱).{0,6}(老闆|董事長|總經理|主管|經理|局長|處長|主任)|(老闆|董事長|總經理|主管|局長|處長).{0,12}(加.{0,4}(LINE|賴)|建.{0,4}群組|新群組)|(開會中|在開會).{0,10}(不方便|不能|沒辦法).{0,4}(接|講)電話|(先|急|幫我).{0,8}(匯|轉).{0,10}(廠商|供應商|貨款))/},
  {k:'rent', name:'看房前先付訂金', tip:'還沒看房、沒簽約就要你先匯訂金，常是假房東', w:3, re:/((租屋|租房|房東|看房|房子|套房).{0,20}(訂金|押金|先匯|先轉|先付)|(訂金|押金).{0,12}(才能|才可以|才帶你)看房|人在國外.{0,12}(房子|鑰匙))/},
  {k:'lovemoney', name:'網友說禮物卡關或急需用錢', tip:'沒見過的網友說禮物卡在海關、要機票錢或醫藥費，是假交友徵婚詐財', w:3, re:/((禮物|包裹|箱子).{0,10}(海關|卡關|關稅|扣押)|機票錢|醫藥費.{0,10}(借|匯|轉|幫)|(美軍|軍醫|維和|聯合國|石油工程師|戰地))/},
- {k:'romance', name:'網友談感情又談錢', tip:'沒見過面的網友噓寒問暖後談投資，是假交友詐騙', w:1, re:/(寶貝|親愛的|老婆|老公|想你|愛你)/},
+ {k:'pointsexp', name:'點數到期快兌換', tip:'「點數即將到期、活動回饋已通過審核」是釣魚簡訊最常用的開頭，點進去會騙信用卡和驗證碼', w:3, re:/((點數|積分|紅利|里程|回饋金|購物金).{0,12}(即將|快要|將於|今日|今天|本月|月底)?.{0,6}(到期|過期|失效|作廢|清零)|(點數|積分|紅利|購物金).{0,8}(兌換|領取).{0,6}(家電|禮券|商品|好禮)|回饋.{0,6}資格.{0,8}(通過|審核)|(合併|整併).{0,10}(點數|積分))/},
+ {k:'malapp', name:'叫你下載或安裝 App', tip:'簡訊叫你下載「安全更新」或安裝 App，常是惡意程式，會偷看你的簡訊驗證碼', w:4, re:/((下載|安裝|更新|點擊).{0,10}(APK|\.apk|安全(更新|元件|憑證|防護)|資安更新|防護(App|APP|程式)|驗證(App|APP)|憑證)|\.apk\b)/i},
+ {k:'travel', name:'入境卡或簽證網站', tip:'假的入境卡、簽證網站會收高額手續費、騙護照和信用卡，要從官方網站申請', w:2, re:/(TDAC|ESTA|\bETA\b|入境卡|電子簽證|簽證.{0,6}(申請|代辦)|入境(申報|登記))/i},
+ {k:'romance', name:'網友談感情又談錢', tip:'沒見過面的網友噓寒問暖後談投資，是假交友詐騙', w:1, re:/(寶貝|親愛的(?!(會員|用戶|客戶|顧客|貴賓|家長|旅客|朋友們|鄉親))|老婆|老公|想你|愛你)/},
 ];
 const CALM = /(不急|有空再)/;
-const OFFICIAL = ['line.me', '7-11.com.tw', 'family.com.tw', 'shopee.tw', 'momoshop.com.tw', 'pchome.com.tw', 'ruten.com.tw', 'fetc.net.tw', 'cht.com.tw', 'taiwanmobile.com', 'fetnet.net', 'esunbank.com', 'cathaybk.com.tw', 'ctbcbank.com', 'fubon.com', 'taishinbank.com.tw', 'sinopac.com', 'megabank.com.tw', 'landbank.com.tw', 'firstbank.com.tw', 'hncb.com.tw', 'tcb-bank.com.tw', 'bot.com.tw', 'google.com', 'youtube.com', 'apple.com', 'facebook.com', 'instagram.com', '104.com.tw', '1111.com.tw', 't-cat.com.tw', 'ecpay.com.tw', 'hct.com.tw', 'jkopay.com', 'icashpay.com.tw', 'myship.7-11.com.tw', 'gov.tw'];
+const OFFICIAL = ['line.me', '7-11.com.tw', 'family.com.tw', 'shopee.tw', 'momoshop.com.tw', 'pchome.com.tw', 'ruten.com.tw', 'fetc.net.tw', 'cht.com.tw', 'taiwanmobile.com', 'fetnet.net', 'esunbank.com', 'cathaybk.com.tw', 'ctbcbank.com', 'fubon.com', 'taishinbank.com.tw', 'sinopac.com', 'megabank.com.tw', 'landbank.com.tw', 'firstbank.com.tw', 'hncb.com.tw', 'tcb-bank.com.tw', 'bot.com.tw', 'google.com', 'youtube.com', 'apple.com', 'facebook.com', 'instagram.com', '104.com.tw', '1111.com.tw', 't-cat.com.tw', 'ecpay.com.tw', 'hct.com.tw', 'jkopay.com', 'icashpay.com.tw', 'myship.7-11.com.tw', 'gov.tw', 'immigration.go.th', 'cbp.dhs.gov', 'gov.uk', 'momo.dm', 'shp.ee'];
 const SHORT = /^(bit\.ly|tinyurl\.com|t\.co|reurl\.cc|lihi\d?\.(cc|com|me)|ppt\.cc|myppt\.cc|pse\.is|s\.id|is\.gd|cutt\.ly|rb\.gy|shorturl\.at|risu\.io|x\.gd|ow\.ly|goo\.gl|tny\.im|0rz\.tw)$/i;
 const BADTLD = /\.(top|xyz|cc|vip|icu|shop|club|buzz|live|online|site|info|cn|sbs|cfd|bond|work|click|link|monster|rest|mom|win|loan|bid|fun|life|store|asia|pw|tk|ml|ga|cf|gq)$/i;
-const BRANDHOST = /(gov|g0v|mvdis|fetc|etag|7-?11|seven|famil|shopee|momo|1ine|line|post|chunghwa|cht|esun|cathay|ctbc|fubon|taishin|sinopac|mega|landbank|bank|apple|icloud|google|netflix|6000|tax|nhi|165|npa|tcat|t-cat|ecpay|hct|jko|icash|myship)/i;
-const BRANDTEXT = /(政府|財政部|監理|公路局|交通部|遠通|ETC|中華郵政|郵局|7-11|統一超商|全家|蝦皮|momo|LINE官方|銀行|健保|國稅局|台電|自來水|普發|165|警政署|中華電信|黑貓|宅急便|綠界|新竹物流|街口|賣貨便|好賣)/i;
+const BRANDHOST = /(gov|g0v|mvdis|fetc|etag|7-?11|seven|famil|shopee|momo|1ine|line|post|chunghwa|cht|esun|cathay|ctbc|fubon|taishin|sinopac|mega|landbank|bank|apple|icloud|google|netflix|6000|tax|nhi|165|npa|tcat|t-cat|ecpay|hct|jko|icash|myship|taipower|water|moda|nhi|mof|etax|fetc)/i;
+const BRANDTEXT = /(政府|財政部|監理|公路局|交通部|遠通|ETC|中華郵政|郵局|7-11|統一超商|全家|蝦皮|momo|LINE官方|銀行|健保|國稅局|台電|自來水|普發|165|警政署|中華電信|黑貓|宅急便|綠界|新竹物流|街口|賣貨便|好賣|監理|公路局|國稅局|稅務局|台水|台灣電力|自來水|資安署|數位發展部|數發部|戶政|法務部|地檢署|法院|勞保|勞動部|健保署|衛福部|入境|移民署)/i;
 function regDomain(h){ const p = h.split('.'); if (p.length >= 3 && /^(com|net|org|gov|edu|idv|co)$/.test(p[p.length - 2]) && p[p.length - 1].length === 2) return p.slice(-3).join('.'); return p.slice(-2).join('.'); }
 function inspectLinks(raw){
   const urls = raw.match(/(https?:\/\/[^\s，。！？、）)」』]+|(?<![@\w.])(?:www\.)?[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:com|net|org|tw|cc|top|xyz|vip|icu|shop|club|buzz|live|online|site|info|cn|me|ly|io|gd|at|co|sbs|cfd|bond|work|click|link|win|fun|store|life)(?:\/[^\s，。！？]*)?)/gi) || [];
@@ -427,7 +433,7 @@ function inspectLinks(raw){
   for (const u0 of [...new Set(urls)]){
     const u = /^https?:/i.test(u0) ? u0 : 'http://' + u0; let host = '';
     try { host = new URL(u).hostname.toLowerCase(); } catch (e) { continue; }
-    const reasons = []; const gov = host === 'gov.tw' || host.endsWith('.gov.tw'); const reg = regDomain(host); const official = gov || OFFICIAL.includes(reg);
+    const reasons = []; const gov = host === 'gov.tw' || host.endsWith('.gov.tw'); const reg = regDomain(host); const official = gov || OFFICIAL.some(d => host === d || host.endsWith('.' + d));
     let fake = false, odd = false;
     if (!official){
       if (/g[o0]v/.test(host)){ reasons.push('網址有「gov」卻不是 .gov.tw 結尾，不是政府網站'); fake = true; }
@@ -458,7 +464,9 @@ const TYPES = [
  ['bindpay', '金融接管（綁卡、換新手機）', '要你把信用卡感應綁定、綁電子支付或買新手機裝 App，對方就能直接盜刷，還會攔截銀行打給你的確認電話。', ['不要綁定、不要安裝對方給的 App', '已經綁定的話，馬上打給每一家發卡銀行停卡', '用另一支電話打 165']],
  ['adult', '色情應召詐騙', '色情應召不合法，也是詐騙熱門手法：先收保證金或會員費，再用各種名目一直要錢，甚至威脅你。', ['不要付任何保證金或點數', '封鎖對方，不要提供住址或工作資訊', '被威脅的話保留證據，打 165 或 110']],
  ['unfreeze', '一直要你補錢（解凍金）', '先收一筆，再用「認證失敗、帳戶凍結、要補解凍金」一直要錢，付多少都拿不回來。', ['不要再付任何一筆錢', '保留對話和匯款紀錄', '打 165 報案，越早越有機會攔下']],
- ['fakeurl', '假冒官方的釣魚網站', '訊息自稱官方，但網址不是官方網址，點進去會騙你輸入個資、信用卡或帳密。', ['不要點連結、不要輸入任何資料', '政府網站一定是 .gov.tw 結尾，gov 前面不會有別的字', '自己打開官方 App 或官網查詢']],
+ ['malapp', '惡意 App（假安全更新）', '叫你下載「安全更新」或安裝 App，裝了之後對方就能偷看你的簡訊驗證碼、盜用帳戶。政府和銀行不會用簡訊叫你裝 App。', ['不要下載、不要安裝', '已經安裝的話，先關網路，再找人幫忙移除並改密碼', '打給銀行說明，必要時停卡']],
+ ['pointsexp', '點數到期釣魚簡訊', '「點數即將到期、快來兌換」是近期最多的釣魚簡訊。點進去會要你填信用卡和驗證碼，卡片馬上被綁定盜刷。', ['不要點簡訊裡的連結', '自己打開官方 App 查點數', '已經填了卡號或驗證碼，馬上打給銀行停卡']],
+ ['fakeurl', '假冒官方的釣魚網站', '訊息自稱官方，但網址不是官方網址，點進去會騙你輸入個資、信用卡或帳密。', ['不要點連結、不要輸入任何資料', '政府網站一定是 .gov.tw 結尾，gov 前面不會有別的字', '政府簡訊只會從「111」發送，開頭會有你手機號碼末三碼和機關名稱', '自己打開官方 App 或官網查詢']],
  ['loan', '假貸款', '銀行不會用簡訊叫你加 LINE 找「信貸專員」，也不會在撥款前先收手續費或保證金。', ['需要借錢請直接到銀行臨櫃或官網申請', '不要加簡訊裡的 LINE，可到 165 查 LINE ID', '不要先付任何費用、不要給存摺或提款卡']],
  ['otp', '盜帳號（騙驗證碼）', '驗證碼等於帳號的鑰匙，給出去帳號就會被盜，再拿去騙你的朋友。', ['不要把驗證碼給任何人，包括朋友', '打電話給本人確認', 'LINE 沒有「好友輔助認證」這種功能']],
  ['imperson', '假冒熟人借錢', '自稱老朋友或換了新號碼，突然急著借錢，很可能是冒充的。', ['打他原本的電話確認是不是本人', '不要先轉帳', '問一個只有本人知道的問題']],
@@ -468,9 +476,10 @@ const TYPES = [
  ['lovemoney', '假交友（徵婚詐財）', '沒見過面的網友說禮物卡在海關、要機票錢或醫藥費，是假交友詐財。真的海關不會叫你匯款給私人帳戶。', ['不要匯任何錢', '對方不肯視訊或見面就是警訊', '把對方照片用圖片搜尋，常是盜圖']],
  ['job', '假求職', '錢多事少、免經驗的工作，多半是要騙你的帳戶或保證金。', ['正當工作不會要你交提款卡、密碼或保證金', '到 104、1111 查公司是否真實', '打 165 諮詢']],
  ['points', '點數詐騙', '正當商家和機關不會叫你買遊戲點數付款，點數一給出去就追不回來。', ['不要購買或拍照傳出點數序號', '打 165 諮詢']],
- ['bill', '釣魚簡訊（假催繳）', '機關、ETC 和物流不會用簡訊附連結叫你線上繳費，連結多半是要騙信用卡。', ['不要點連結、不要輸入信用卡', '自己打開官方 App 或官網查詢', '已經輸入卡號的話，馬上打給銀行停卡']],
+ ['bill', '釣魚簡訊（假催繳）', '機關、ETC 和物流不會用簡訊附連結叫你線上繳費，連結多半是要騙信用卡。', ['不要點連結、不要輸入信用卡', '國道通行費簡訊只會寫車號，不會附繳費連結', '政府簡訊只會從「111」發送，開頭有你手機末三碼', '自己打開官方 App 或官網查詢', '已經輸入卡號的話，馬上打給銀行停卡']],
  ['freebie', '假好康（釣魚）', '天上掉下來的獎品卻要你付運費或填資料，多半是要騙個資或信用卡。', ['不要點連結、不要付運費', '到官方網站或 App 確認有沒有這個活動']],
  ['group', '假投資群組', '先送贈品、拉進福利群每天簽到，再由「老師」報明牌、叫你下載 App 入金，是假投資最常見的開頭。', ['不要下載對方給的 App、不要入金', '退出群組，到 165 查 LINE ID', '投資只找合法券商，查金管會名單']],
+ ['travel', '假入境卡或簽證網站', '假的入境卡、簽證網站長得和官方很像，會收高額手續費、騙護照資料和信用卡。', ['只從官方網站申請（網址看清楚是不是政府網站）', '已經付款的話，打給銀行處理', '打 165 諮詢']],
  ['shorturl', '可疑的網址', '短網址或少見的網址結尾，常被用來藏釣魚網站。', ['不要點，先問傳給你的人是什麼', '把網址貼到 165 打詐儀錶板查詢']],
  ['foreign', '可疑來電', '顯示 + 號開頭的來電多半是境外偽造，常假冒機關或銀行。', ['掛斷後自己查官方電話回撥', '有疑問打 165']],
  ['platform', '私下交易詐騙', '陌生人叫你加 LINE 或離開平台私下交易，付了錢常常就找不到人，也沒有平台保障。', ['留在原本的平台交易', '不要先匯訂金給私人帳戶']],
@@ -491,7 +500,7 @@ const fresh = () => ({tab:'home', tip:Math.floor(Math.random() * 6), page:null, 
   circle:/[?&]demo/.test(location.search) ? [{id:1,name:'志明',rel:'弟弟',status:'active',c:0}] : [], me:'', guarding:[], synced:0, chats:[], cur:'c' + Date.now(), shareChat:true, trig:{high:true, recover:true, ask:true}, share:false, paused:false, accepted:false, log:[],
   rec:null, pts:120, today:0, done:{}, vid:null, prog:0, q:0, pick:null, right:0, gain:0, codes:[], tasks:{}, invRel:'母親', listening:false});
 let S = fresh();
-const BUILD = '2026-11-27.1';
+const BUILD = '2026-11-27.2';
 let SAMPLE = null, TTS = null, DICT = null;
 if (/[?&]demo/.test(location.search)) document.documentElement.classList.add('demo');
 function webTTS(){ if (!('speechSynthesis' in window)) return null;
@@ -621,11 +630,14 @@ function analyse(raw){
   if (f('rent') && (f('money') || f('pressure'))) score += 2;
   if (f('lovemoney') && (f('romance') || f('money'))) score += 2;
   if (f('bill') && f('cs')) score += 2;
+  if (f('pointsexp') && (f('link') || f('pressure'))) score += 2;
+  if (f('travel') && f('link')) score += 2;
+  if (f('link') && /(\d{1,3}\s*元)/.test(raw) && (f('bill') || f('pressure'))) score += 1; // 小金額＋連結＋催時效
   const big = (raw.match(/\d+(\.\d+)?\s*萬|[一二三四五六七八九十兩百]+萬|\d{5,}\s*元|\d{2,3},\d{3}/) || [])[0];
   if (big && f('money')) score += 1;
-  const strong = ['ship', 'bindpay', 'task', 'boss', 'rent', 'lovemoney', 'adult', 'unfreeze', 'extort', 'telecom', 'fake165', 'group', 'fakeurl', 'shorturl', 'foreign', 'platform', 'secrecy', 'profit', 'withdraw', 'authority', 'imperson', 'otp', 'card', 'remote', 'points', 'loan', 'cs', 'link', 'bill', 'freebie', 'job'];
+  const strong = ['malapp', 'pointsexp', 'travel', 'ship', 'bindpay', 'task', 'boss', 'rent', 'lovemoney', 'adult', 'unfreeze', 'extort', 'telecom', 'fake165', 'group', 'fakeurl', 'shorturl', 'foreign', 'platform', 'secrecy', 'profit', 'withdraw', 'authority', 'imperson', 'otp', 'card', 'remote', 'points', 'loan', 'cs', 'link', 'bill', 'freebie', 'job'];
   if (f('bill') && !f('link') && !f('money') && !f('pressure')) score = Math.min(score, 2);
-  if (['otp', 'card', 'remote', 'withdraw', 'points', 'extort', 'fake165', 'unfreeze', 'fakeurl', 'ship', 'bindpay'].some(f)) score = Math.max(score, 6);
+  if (['otp', 'card', 'remote', 'withdraw', 'points', 'extort', 'fake165', 'unfreeze', 'fakeurl', 'ship', 'bindpay', 'malapp'].some(f)) score = Math.max(score, 6);
   if (f('money') || f('link')) score = Math.max(score, 3); // 只要牽涉金錢或陌生連結，至少要提高警覺
   if (f('authority') && (f('money') || f('secrecy') || f('card'))) score = Math.max(score, 6);
   if (f('authority') && /(冒用|盜領)/.test(raw) && /(轉接|筆錄|警察|檢察|書記官)/.test(raw)) score = Math.max(score, 6);
@@ -752,10 +764,10 @@ function reviewSheet(){
 }
 // ---------- smarter assistant: stages, replies, situations ----------
 const STAGES = [
- ['接觸你', ['imperson', 'platform', 'group', 'freebie', 'loan', 'job', 'adult', 'romance', 'foreign', 'bill', 'telecom', 'link', 'fakeurl', 'shorturl']],
- ['取得信任', ['profit', 'authority', 'cs', 'loan', 'romance', 'group', 'imperson', 'telecom', 'adult']],
- ['要錢或要資料', ['money', 'otp', 'card', 'remote', 'points', 'fakeurl', 'link']],
- ['不讓你查證', ['secrecy', 'pressure', 'fake165']],
+ ['接觸你', ['imperson', 'platform', 'group', 'freebie', 'loan', 'job', 'adult', 'romance', 'foreign', 'bill', 'telecom', 'link', 'fakeurl', 'shorturl', 'pointsexp', 'travel', 'task', 'boss', 'rent']],
+ ['取得信任', ['profit', 'authority', 'cs', 'loan', 'romance', 'group', 'imperson', 'telecom', 'adult', 'boss', 'lovemoney', 'task']],
+ ['要錢或要資料', ['money', 'otp', 'card', 'remote', 'points', 'fakeurl', 'link', 'ship', 'bindpay', 'malapp', 'rent', 'lovemoney']],
+ ['不讓你查證', ['secrecy', 'pressure', 'fake165', 'bindpay']],
  ['一直加碼', ['unfreeze', 'withdraw', 'extort']],
 ];
 function stageOf(r){ const on = STAGES.map(s => s[1].some(k => r.found[k])); let top = -1; on.forEach((v, i) => { if (v) top = i; }); return {on, top}; }
